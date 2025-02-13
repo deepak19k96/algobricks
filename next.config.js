@@ -6,7 +6,7 @@ require('dotenv').config({ path: '.env.production' })
 
 module.exports = {
   env: {
-    API_URL: process.env.NEXT_PUBLIC_API_URL
+    API_URL: 'online.youngengineers.org'
   },
 
   // Enable the Webpack 5 if not already enabled (default for newer Next.js versions)

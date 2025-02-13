@@ -20,13 +20,13 @@ jobs:
 
       - name: Copy files via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no root@147.182.188.127 'rm -rf /var/www/seatlynx/*'
-          scp -o StrictHostKeyChecking=no -r * root@147.182.188.127:/var/www/seatlynx
+          ssh -o StrictHostKeyChecking=no root@147.182.188.127 'rm -rf /var/www/youngengineers/*'
+          scp -o StrictHostKeyChecking=no -r * root@147.182.188.127:/var/www/youngengineers
 
       - name: Install dependencies and restart server
         run: |
           ssh -o StrictHostKeyChecking=no root@147.182.188.127 << 'EOF'
-          cd /var/www/seatlynx
+          cd /var/www/youngengineers
           yarn install
           pm2 restart server
           EOF
