@@ -1,11 +1,13 @@
-// ** Next Imports
+// pages/_app.js
 import Head from 'next/head'
-import { Router } from 'next/router'
+import { useRouter } from 'next/router' // Import useRouter
+import { useEffect } from 'react'
 
+// ** Redux Imports
 import { Provider } from 'react-redux'
 import { store } from '../store'
 
-// ** Loader Import
+// ** Loader Import (NProgress)
 import NProgress from 'nprogress'
 
 // ** Emotion Imports
@@ -18,6 +20,7 @@ import themeConfig from 'src/configs/themeConfig'
 import UserLayout from 'src/layouts/UserLayout'
 import ThemeComponent from 'src/@core/theme/ThemeComponent'
 import Snackbar from 'src/@core/components/snackbar'
+import GlobalLoader from 'src/@core/components/GlobalLoader/GlobalLoader' // Global loader import
 
 // ** Contexts
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
@@ -34,24 +37,29 @@ import '../../styles/globals.css'
 
 const clientSideEmotionCache = createEmotionCache()
 
-// ** Pace Loader
+// ** Pace Loader using NProgress (if enabled in your themeConfig)
 if (themeConfig.routingLoader) {
-  Router.events.on('routeChangeStart', () => {
-    NProgress.start()
-  })
-  Router.events.on('routeChangeError', () => {
-    NProgress.done()
-  })
-  Router.events.on('routeChangeComplete', () => {
-    NProgress.done()
-  })
+  NProgress.configure({ showSpinner: false })
+  // Optionally, you can add additional NProgress event handling here.
 }
 
-// ** Configure JSS & ClassName
 const App = props => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+  const router = useRouter()
 
-  // Variables
+  // Global authentication check
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken')
+      const publicRoutes = ['/pages/login']
+      
+      if (!token && !publicRoutes.includes(router.pathname)) {
+        router.push('/pages/login')
+      }
+    }
+  }, [router.pathname, router])
+
+  // Get the layout for the page, defaulting to UserLayout if not provided
   const getLayout = Component.getLayout ?? (page => <UserLayout>{page}</UserLayout>)
 
   return (
@@ -67,9 +75,13 @@ const App = props => {
         <SettingsProvider>
           <UserProfileProvider>
             <SettingsConsumer>
-              {({ settings }) => {
-                return <ThemeComponent settings={settings}>{getLayout(<Component {...pageProps} />)}</ThemeComponent>
-              }}
+              {({ settings }) => (
+                <ThemeComponent settings={settings}>
+                  {/* Global loader is rendered here */}
+                  <GlobalLoader />
+                  {getLayout(<Component {...pageProps} />)}
+                </ThemeComponent>
+              )}
             </SettingsConsumer>
           </UserProfileProvider>
         </SettingsProvider>

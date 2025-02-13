@@ -13,7 +13,24 @@ const BuildingInstructions = () => {
     dispatch(fetchInstructions())
   }, [dispatch])
 
-  if (loading) return <div>Loading...</div>
+  if (loading)
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <img
+          src="/images/loader.gif"
+          alt="Loading..."
+          style={{ width: 100, height: 100 }}
+        />
+      </Box>
+    )
+
   if (error) return <div>Error: {error}</div>
 
   return (
