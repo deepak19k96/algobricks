@@ -40,34 +40,43 @@ const clientSideEmotionCache = createEmotionCache()
 // ** Pace Loader using NProgress (if enabled in your themeConfig)
 if (themeConfig.routingLoader) {
   NProgress.configure({ showSpinner: false })
-  // Optionally, you can add additional NProgress event handling here.
 }
 
 const App = props => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   const router = useRouter()
-
-  // Global authentication check
   useEffect(() => {
+    if (!Component) {
+      console.error('Component is undefined or null in _app.js.')
+    }
+
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken')
       const publicRoutes = ['/pages/login']
-      
       if (!token && !publicRoutes.includes(router.pathname)) {
         router.push('/pages/login')
       }
     }
-  }, [router.pathname, router])
+  }, [router.pathname, router, Component])
 
-  // Get the layout for the page, defaulting to UserLayout if not provided
+  if (!Component) {
+    return null
+  }
+
   const getLayout = Component.getLayout ?? (page => <UserLayout>{page}</UserLayout>)
 
   return (
     <CacheProvider value={emotionCache}>
       <Head>
         <title>{`${themeConfig.templateName} - Portal`}</title>
-        <meta name='description' content={`${themeConfig.templateName} – Portal for google wallet and bot.`} />
-        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
+        <meta
+          name='description'
+          content={`${themeConfig.templateName} – Portal for google wallet and bot.`}
+        />
+        <meta
+          name='keywords'
+          content='Material Design, MUI, Admin Template, React Admin Template'
+        />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
       <Provider store={store}>
@@ -77,7 +86,6 @@ const App = props => {
             <SettingsConsumer>
               {({ settings }) => (
                 <ThemeComponent settings={settings}>
-                  {/* Global loader is rendered here */}
                   <GlobalLoader />
                   {getLayout(<Component {...pageProps} />)}
                 </ThemeComponent>

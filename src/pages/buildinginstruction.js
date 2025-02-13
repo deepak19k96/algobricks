@@ -3,17 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Box, Typography, Grid, Card, CardContent } from '@mui/material'
 import { fetchInstructions } from 'src/store/instructionsSlice' // adjust the import path accordingly
 
-const BuildingInstructions = () => {
+const BuildingInstruction = () => {
   const dispatch = useDispatch()
-  const { items: instructions, loading, error } = useSelector(
-    state => state.instructions
-  )
+  const { items: instructions, loading, error } = useSelector(state => state.instructions)
 
   useEffect(() => {
     dispatch(fetchInstructions())
   }, [dispatch])
 
-  if (loading)
+  if (loading) {
     return (
       <Box
         sx={{
@@ -23,13 +21,10 @@ const BuildingInstructions = () => {
           minHeight: '100vh',
         }}
       >
-        <img
-          src="/images/loader.gif"
-          alt="Loading..."
-          style={{ width: 100, height: 100 }}
-        />
+        <img src="/images/loader.gif" alt="Loading..." style={{ width: 100, height: 100 }} />
       </Box>
     )
+  }
 
   if (error) return <div>Error: {error}</div>
 
@@ -38,12 +33,11 @@ const BuildingInstructions = () => {
       sx={{
         width: '100%',
         minHeight: '100%',
-        backgroundImage:
-          'url("https://online.youngengineers.org/static/media/select_program.a29bba9c.jpg")',
+        backgroundImage: 'url("https://online.youngengineers.org/static/media/select_program.a29bba9c.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
-        marginTop: '40px',
+        marginTop: '60px',
         py: 4,
       }}
     >
@@ -64,7 +58,6 @@ const BuildingInstructions = () => {
                   },
                 }}
               >
-                {/* Header with lego_long image and title */}
                 <Box
                   sx={{
                     position: 'relative',
@@ -94,7 +87,6 @@ const BuildingInstructions = () => {
                   />
                 </Box>
 
-                {/* Main content with program_logo */}
                 <CardContent
                   sx={{
                     display: 'flex',
@@ -106,11 +98,7 @@ const BuildingInstructions = () => {
                   }}
                 >
                   <img
-                    src={
-                      item.program_logo
-                        ? item.program_logo[0]
-                        : 'https://via.placeholder.com/150'
-                    }
+                    src={item.program_logo ? item.program_logo[0] : 'https://via.placeholder.com/150'}
                     alt={item.title.rendered}
                     style={{ maxWidth: '100%', maxHeight: '160px' }}
                   />
@@ -124,4 +112,4 @@ const BuildingInstructions = () => {
   )
 }
 
-export default BuildingInstructions
+export default BuildingInstruction

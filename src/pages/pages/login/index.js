@@ -109,7 +109,6 @@ const LoginPage = () => {
       sx={{
         width: '100vw',
         height: '100vh',
-        // Background image from screenshot
         backgroundImage:
           'url("https://online.youngengineers.org/static/media/LoginBackground.e7741a88.jpg")',
         backgroundRepeat: 'no-repeat',
@@ -174,7 +173,6 @@ const LoginPage = () => {
                 fontWeight: 700,
                 textAlign: 'center',
                 mb: 4,
-                // Adjust color/size to match screenshot
                 color: '#054A91'
               }}
             >
@@ -286,7 +284,6 @@ const LoginPage = () => {
                 variant='contained'
                 sx={{
                   mb: 4,
-                  // Match screenshot color
                   backgroundColor: '#054A91',
                   color: '#fff',
                   fontWeight: 700,

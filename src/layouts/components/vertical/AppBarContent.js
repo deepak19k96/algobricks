@@ -1,68 +1,56 @@
-// ** MUI Imports
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import InputAdornment from '@mui/material/InputAdornment'
-
-// ** Icons Imports
-import Menu from 'mdi-material-ui/Menu'
-import Magnify from 'mdi-material-ui/Magnify'
-
-// ** Components
-import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
-import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 
-const AppBarContent = props => {
-  // ** Props
-  const { hidden, settings, saveSettings, toggleNavVisibility } = props
-
-  // ** Hook
-  const hiddenSm = useMediaQuery(theme => theme.breakpoints.down('sm'))
-
+const AppBarContent = () => {
   return (
-<Box
-  sx={{
-    width: '100vw',
-    height: '100px',
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    zIndex: 1100,
-    backgroundImage: 'url("https://online.youngengineers.org/static/media/Header_admin.9c76f9b7.jpg")',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 16px',
-  }}
->
-  {/* Left Content with User Display Name */}
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
     <Box
       sx={{
-        backgroundColor: '#8BC34A', // Green background color
-        color: '#fff',
-        fontWeight: 800,
-        borderRadius: '20px',
-        padding: '8px 16px',
-        display: 'inline-block',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '120px',
+        zIndex: 1100,
+        // Keep the background image if desired
+        backgroundImage:
+          'url("https://online.youngengineers.org/static/media/Header_admin.9c76f9b7.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}
     >
-      Hi {typeof window !== 'undefined' && JSON.parse(localStorage.getItem('user'))?.user_display_name}
+      {/* Green bubble flush left */}
+      <Box
+        sx={{
+          height: '75px',
+          backgroundColor: '#91B508',
+          width: '170px',
+          color: '#fff',
+          fontWeight: 500,
+          fontSize: '2rem',
+          // Rounded on right side only
+          borderRadius: '0 40px 40px 0',
+          // Horizontal padding so text doesn't touch edges
+          px: 3,
+          // Center text vertically
+          display: 'flex',
+          alignItems: 'center',
+          // No margin on the left so it’s flush
+          ml: 0
+        }}
+      >
+        Hi{' '}
+        {typeof window !== 'undefined' &&
+          JSON.parse(localStorage.getItem('user'))?.user_display_name}
+      </Box>
+
+      {/* Right side: User Dropdown */}
+      <Box sx={{ mr: 15 }}>
+        <UserDropdown />
+      </Box>
     </Box>
-  </Box>
-
-  {/* Right Content (User Dropdown) */}
-  <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center', marginRight: '40px' }}>
-    <UserDropdown />
-  </Box>
-</Box>
-
-
-  
   )
 }
 
