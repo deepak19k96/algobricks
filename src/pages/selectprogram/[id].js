@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchInstructions } from 'src/store/instructionsSlice' // adjust path as needed
+import { fetchChildPages } from 'src/store/modelsSlice' // using redux thunk for fetching models
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props
@@ -66,25 +67,27 @@ const CodeFooter = styled(Box)(() => ({
 export default function SelectProgram() {
   const router = useRouter()
   const { id } = router.query
-
   const dispatch = useDispatch()
+
   // Get instructions from Redux state
-  const { items: instructions, loading: instructionsLoading, error: instructionsError } = useSelector(
-    state => state.instructions
+  const {
+    items: instructions,
+    loading: instructionsLoading,
+    error: instructionsError,
+  } = useSelector(state => state.instructions)
+
+  // Get models from Redux state
+  const { items: models, loading: modelsLoading, error: modelsError } = useSelector(
+    state => state.models
   )
-
-  const [loading, setLoading] = useState(true)
-
-  const [mainModels, setMainModels] = useState([])
-  const [experimentalModels, setExperimentalModels] = useState([])
 
   const [tabValue, setTabValue] = useState(0)
 
   useEffect(() => {
     if (id) {
-      fetchChildPages(id)
+      dispatch(fetchChildPages(id))
     }
-  }, [id])
+  }, [id, dispatch])
 
   useEffect(() => {
     if (!instructions || instructions.length === 0) {
@@ -92,35 +95,11 @@ export default function SelectProgram() {
     }
   }, [dispatch, instructions])
 
-  async function fetchChildPages(parentId) {
-    try {
-      setLoading(true)
-      const response = await fetch(
-        `https://online.youngengineers.org/db/wp-json/wp/v2/pages?parent=${parentId}&per_page=100`
-      )
-      const data = await response.json()
+  // Separate main and experimental models
+  const mainModels = models.filter(item => !item?.acf?.experimental_model)
+  const experimentalModels = models.filter(item => item?.acf?.experimental_model)
 
-      const main = []
-      const experimental = []
-      data.forEach(item => {
-        const isExperimental = item?.acf?.experimental_model
-        if (isExperimental) {
-          experimental.push(item)
-        } else {
-          main.push(item)
-        }
-      })
-
-      setMainModels(main)
-      setExperimentalModels(experimental)
-    } catch (error) {
-      console.error('Error fetching child pages:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading || instructionsLoading) {
+  if (modelsLoading || instructionsLoading) {
     return (
       <Box
         sx={{
@@ -191,21 +170,21 @@ export default function SelectProgram() {
   const hasMain = mainModels.length > 0
   const hasExperimental = experimentalModels.length > 0
 
-  const firstChild = mainModels[0] || experimentalModels[0] || {};
-
-  let lessonProgramRelation = '';
+  // Use the first model (if available) to extract the lesson program relation
+  const firstChild = mainModels[0] || experimentalModels[0] || {}
+  let lessonProgramRelation = ''
   if (firstChild.link) {
-    const parts = firstChild.link.split('/');
-    const idx = parts.indexOf('programsparent');
+    const parts = firstChild.link.split('/')
+    const idx = parts.indexOf('programsparent')
     if (idx !== -1 && parts.length > idx + 1) {
-      lessonProgramRelation = parts[idx + 1];
+      lessonProgramRelation = parts[idx + 1]
     }
   }
   console.log('Lesson Program Relation:', lessonProgramRelation)
   console.log('Instructions:', instructions)
 
   let backgroundImageUrl = ''
-  let programLogoUrl = '';
+  let programLogoUrl = ''
 
   if (lessonProgramRelation && instructions && instructions.length > 0) {
     const matchingInstruction = instructions.find(inst =>
@@ -218,11 +197,11 @@ export default function SelectProgram() {
         : matchingInstruction.program_desktop_backgroung
     }
     if (matchingInstruction?.program_logo) {
-        programLogoUrl = Array.isArray(matchingInstruction.program_logo)
-          ? matchingInstruction.program_logo[0]
-          : matchingInstruction.program_logo;
-      }
-      console.log('Program Logo:', programLogoUrl)
+      programLogoUrl = Array.isArray(matchingInstruction.program_logo)
+        ? matchingInstruction.program_logo[0]
+        : matchingInstruction.program_logo
+    }
+    console.log('Program Logo:', programLogoUrl)
   }
   console.log('Computed backgroundImageUrl:', backgroundImageUrl)
 
@@ -243,25 +222,64 @@ export default function SelectProgram() {
         py: 4,
       }}
     >
-  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-      {programLogoUrl && (
-        <Box
-          component="img"
-          src={programLogoUrl}
-          alt="Program Logo"
-          sx={{ maxWidth: '200px', height: 'auto' }}
-        />
-      )}
-    </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        {programLogoUrl && (
+          <Box
+            component="img"
+            src={programLogoUrl}
+            alt="Program Logo"
+            sx={{ maxWidth: '200px', height: 'auto' }}
+          />
+        )}
+      </Box>
 
       {hasMain && hasExperimental ? (
         <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
-            <Tabs value={tabValue} onChange={handleTabChange}>
-              <Tab label="Main Models" />
-              <Tab label="Experimental Models" />
-            </Tabs>
-          </Box>
+       <Box sx={{ mt: 4, pl: 2, pr: 2 }}>
+       <Tabs
+    value={tabValue}
+    onChange={handleTabChange}
+    sx={{
+      maxWidth: '1200px',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      '& .MuiTab-root': {
+        fontSize: '16px',
+        fontWeight: 600,
+        textTransform: 'none',
+        color: '#000', // Default color is black
+        minWidth: '150px',
+        padding: '12px 16px',
+        border: 'none',
+        transition: 'color 0.3s ease',
+        '&.Mui-selected': {
+          color: '#fff', // Change color to white when selected
+          backgroundColor: '#91B508',
+          borderRadius: '5px 5px 0 0',
+        },
+      },
+      '& .MuiTabs-indicator': {
+        display: 'none', // Hide default indicator
+      },
+    }}
+  >
+
+    <Tab label="Main Models" />
+    <Tab label="Experimental Models" />
+  </Tabs>
+
+  <Box
+    sx={{
+      height: '4px',
+      backgroundColor: '#91B508',
+      width: '100%',
+      maxWidth: '1200px',
+      margin: '0 auto',
+      mt: '-4px', // Bring the line up to touch the tab
+    }}
+  />
+</Box>
+
           <TabPanel value={tabValue} index={0}>
             <Grid
               container
