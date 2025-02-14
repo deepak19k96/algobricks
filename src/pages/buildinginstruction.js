@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Box, Typography, Grid, Card, CardContent } from '@mui/material'
+import { useRouter } from 'next/router'
 import { fetchInstructions } from 'src/store/instructionsSlice' // adjust the import path accordingly
 
 const BuildingInstruction = () => {
   const dispatch = useDispatch()
+  const router = useRouter()
   const { items: instructions, loading, error } = useSelector(state => state.instructions)
 
   useEffect(() => {
@@ -33,7 +35,8 @@ const BuildingInstruction = () => {
       sx={{
         width: '100%',
         minHeight: '100%',
-        backgroundImage: 'url("https://online.youngengineers.org/static/media/select_program.a29bba9c.jpg")',
+        backgroundImage:
+          'url("https://online.youngengineers.org/static/media/select_program.a29bba9c.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -46,6 +49,7 @@ const BuildingInstruction = () => {
           {instructions.map(item => (
             <Grid item key={item.id}>
               <Card
+                onClick={() => router.push(`/selectprogram/${item.id}`)}
                 sx={{
                   width: 350,
                   height: 250,
@@ -98,7 +102,11 @@ const BuildingInstruction = () => {
                   }}
                 >
                   <img
-                    src={item.program_logo ? item.program_logo[0] : 'https://via.placeholder.com/150'}
+                    src={
+                      item.program_logo
+                        ? item.program_logo[0]
+                        : 'https://via.placeholder.com/150'
+                    }
                     alt={item.title.rendered}
                     style={{ maxWidth: '100%', maxHeight: '160px' }}
                   />

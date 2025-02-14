@@ -86,7 +86,7 @@ const App = props => {
             <SettingsConsumer>
               {({ settings }) => (
                 <ThemeComponent settings={settings}>
-                  <GlobalLoader />
+                  {/* <GlobalLoader /> */}
                   {getLayout(<Component {...pageProps} />)}
                 </ThemeComponent>
               )}
