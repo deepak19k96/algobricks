@@ -13,6 +13,7 @@ import UserLayout from 'src/layouts/UserLayout'
 // TabPanel Component
 function TabPanel(props) {
   const { children, value, index, ...other } = props
+
   return (
     <div
       role="tabpanel"
@@ -172,6 +173,7 @@ export default function SelectProgram() {
     }
     let image = item.small_image || item.acf?.small_image?.url || '/images/placeholder.png'
     let lessonPassword = item.acf?.lesson_password || ''
+
     return {
       id: modelId,
       title: modelTitle,
@@ -184,10 +186,9 @@ export default function SelectProgram() {
   // Render a model card. On click, store backgroundImageUrl in Redux and navigate.
   const renderModelCard = model => {
     const { id: modelId, title, legoHeader, image, lessonPassword } = extractModelData(model)
+
     const handleClick = () => {
-      // Save the backgroundImageUrl in Redux (so it is not exposed in the URL)
       dispatch(setBackgroundImageUrl(backgroundImageUrl))
-      // Navigate to the next component without sending the URL as a parameter
       router.push(`/selectprogram/${id}/${modelId}`)
     }
 
@@ -367,9 +368,12 @@ export default function SelectProgram() {
     </Box>
   )
 }
+
 SelectProgram.getLayout = page => {
+
   return (
-    <UserLayout pageTitle='Select Model'showIcons>
+
+    <UserLayout pageTitle='Select Model' showIcons>
       {page}
     </UserLayout>
   )

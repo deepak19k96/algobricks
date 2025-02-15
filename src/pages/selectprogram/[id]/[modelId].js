@@ -16,7 +16,6 @@ const SelectProgramModel = () => {
   const { modelData, galleryImages, loading, error } = useSelector(
     (state) => state.model
   )
-  // Get background image from Redux (from ui slice)
   const backgroundImageUrl = useSelector((state) => state.ui.backgroundImageUrl)
 
   useEffect(() => {
