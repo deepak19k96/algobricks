@@ -1,12 +1,16 @@
+// src/pages/selectprogram/[id]/index.jsx (or wherever your component lives)
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Box, Typography, Tabs, Tab, Grid, Stack } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchInstructions } from 'src/store/instructionsSlice' // adjust path as needed
-import { fetchChildPages } from 'src/store/modelsSlice' // using redux thunk for fetching models
+import { fetchInstructions } from 'src/store/instructionsSlice' // Adjust the path as needed
+import { fetchChildPages } from 'src/store/modelsSlice' // Adjust the path as needed
+import { setBackgroundImageUrl } from 'src/store/uiSlice' // Import our new action
+import UserLayout from 'src/layouts/UserLayout'
 
+// TabPanel Component
 function TabPanel(props) {
   const { children, value, index, ...other } = props
   return (
@@ -22,6 +26,7 @@ function TabPanel(props) {
   )
 }
 
+// Styled components for the card layout
 const ModelCard = styled(Box)(({ theme }) => ({
   width: 185,
   borderRadius: 8,
@@ -64,21 +69,20 @@ const CodeFooter = styled(Box)(() => ({
   justifyContent: 'center',
 }))
 
+// Main Component
 export default function SelectProgram() {
   const router = useRouter()
   const { id } = router.query
   const dispatch = useDispatch()
 
   // Get instructions from Redux state
-  const {
-    items: instructions,
-    loading: instructionsLoading,
-    error: instructionsError,
-  } = useSelector(state => state.instructions)
+  const { items: instructions, loading: instructionsLoading } = useSelector(
+    (state) => state.instructions
+  )
 
   // Get models from Redux state
-  const { items: models, loading: modelsLoading, error: modelsError } = useSelector(
-    state => state.models
+  const { items: models, loading: modelsLoading } = useSelector(
+    (state) => state.models
   )
 
   const [tabValue, setTabValue] = useState(0)
@@ -99,6 +103,7 @@ export default function SelectProgram() {
   const mainModels = models.filter(item => !item?.acf?.experimental_model)
   const experimentalModels = models.filter(item => item?.acf?.experimental_model)
 
+  // Show a loading indicator while fetching data
   if (modelsLoading || instructionsLoading) {
     return (
       <Box
@@ -118,11 +123,77 @@ export default function SelectProgram() {
     setTabValue(newValue)
   }
 
+  // Compute the backgroundImageUrl from instructions data
+  const firstChild = mainModels[0] || experimentalModels[0] || {}
+  let lessonProgramRelation = ''
+  if (firstChild.link) {
+    const parts = firstChild.link.split('/')
+    const idx = parts.indexOf('programsparent')
+    if (idx !== -1 && parts.length > idx + 1) {
+      lessonProgramRelation = parts[idx + 1]
+    }
+  }
+
+  let backgroundImageUrl = ''
+  let programLogoUrl = ''
+
+  if (lessonProgramRelation && instructions && instructions.length > 0) {
+    const matchingInstruction = instructions.find(inst =>
+      inst.slug.toLowerCase().trim() === lessonProgramRelation.toLowerCase().trim()
+    )
+    if (matchingInstruction) {
+      backgroundImageUrl = Array.isArray(matchingInstruction.program_desktop_backgroung)
+        ? matchingInstruction.program_desktop_backgroung[0]
+        : matchingInstruction.program_desktop_backgroung
+    }
+    if (matchingInstruction?.program_logo) {
+      programLogoUrl = Array.isArray(matchingInstruction.program_logo)
+        ? matchingInstruction.program_logo[0]
+        : matchingInstruction.program_logo
+    }
+  }
+  if (!backgroundImageUrl) {
+    backgroundImageUrl = 'https://via.placeholder.com/1920x1080?text=No+Background+Image'
+  }
+
+  // Determine if we have any main or experimental models
+  const hasMain = mainModels.length > 0
+  const hasExperimental = experimentalModels.length > 0
+
+  // Function to extract data from each model
+  function extractModelData(item) {
+    const modelId = item?.id
+    const modelTitle = item?.title?.rendered || 'No Title'
+    let legoHeader = ''
+    if (Array.isArray(item.single_model_lego_color) && item.single_model_lego_color[0]) {
+      legoHeader = item.single_model_lego_color[0]
+    } else if (item.acf?.single_model_lego_color?.url) {
+      legoHeader = item.acf.single_model_lego_color.url
+    }
+    let image = item.small_image || item.acf?.small_image?.url || '/images/placeholder.png'
+    let lessonPassword = item.acf?.lesson_password || ''
+    return {
+      id: modelId,
+      title: modelTitle,
+      legoHeader,
+      image,
+      lessonPassword,
+    }
+  }
+
+  // Render a model card. On click, store backgroundImageUrl in Redux and navigate.
   const renderModelCard = model => {
     const { id: modelId, title, legoHeader, image, lessonPassword } = extractModelData(model)
+    const handleClick = () => {
+      // Save the backgroundImageUrl in Redux (so it is not exposed in the URL)
+      dispatch(setBackgroundImageUrl(backgroundImageUrl))
+      // Navigate to the next component without sending the URL as a parameter
+      router.push(`/selectprogram/${id}/${modelId}`)
+    }
+
     return (
       <Grid item xs={1} key={modelId}>
-        <ModelCard>
+        <ModelCard onClick={handleClick}>
           <LegoHeader background={legoHeader}>
             <Typography
               variant="subtitle1"
@@ -167,48 +238,6 @@ export default function SelectProgram() {
     )
   }
 
-  const hasMain = mainModels.length > 0
-  const hasExperimental = experimentalModels.length > 0
-
-  // Use the first model (if available) to extract the lesson program relation
-  const firstChild = mainModels[0] || experimentalModels[0] || {}
-  let lessonProgramRelation = ''
-  if (firstChild.link) {
-    const parts = firstChild.link.split('/')
-    const idx = parts.indexOf('programsparent')
-    if (idx !== -1 && parts.length > idx + 1) {
-      lessonProgramRelation = parts[idx + 1]
-    }
-  }
-  console.log('Lesson Program Relation:', lessonProgramRelation)
-  console.log('Instructions:', instructions)
-
-  let backgroundImageUrl = ''
-  let programLogoUrl = ''
-
-  if (lessonProgramRelation && instructions && instructions.length > 0) {
-    const matchingInstruction = instructions.find(inst =>
-      inst.slug.toLowerCase().trim() === lessonProgramRelation.toLowerCase().trim()
-    )
-    console.log('Matching Instruction:', matchingInstruction)
-    if (matchingInstruction) {
-      backgroundImageUrl = Array.isArray(matchingInstruction.program_desktop_backgroung)
-        ? matchingInstruction.program_desktop_backgroung[0]
-        : matchingInstruction.program_desktop_backgroung
-    }
-    if (matchingInstruction?.program_logo) {
-      programLogoUrl = Array.isArray(matchingInstruction.program_logo)
-        ? matchingInstruction.program_logo[0]
-        : matchingInstruction.program_logo
-    }
-    console.log('Program Logo:', programLogoUrl)
-  }
-  console.log('Computed backgroundImageUrl:', backgroundImageUrl)
-
-  if (!backgroundImageUrl) {
-    backgroundImageUrl = 'https://via.placeholder.com/1920x1080?text=No+Background+Image'
-  }
-
   return (
     <Box
       sx={{
@@ -235,55 +264,54 @@ export default function SelectProgram() {
 
       {hasMain && hasExperimental ? (
         <>
-       <Box sx={{ mt: 4, pl: 2, pr: 2 }}>
-       <Tabs
-    value={tabValue}
-    onChange={handleTabChange}
-    sx={{
-      maxWidth: '1200px',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      '& .MuiTab-root': {
-        fontSize: '16px',
-        fontWeight: 600,
-        textTransform: 'none',
-        color: '#000', // Default color is black
-        minWidth: '150px',
-        padding: '12px 16px',
-        border: 'none',
-        transition: 'color 0.3s ease',
-        '&.Mui-selected': {
-          color: '#fff', // Change color to white when selected
-          backgroundColor: '#91B508',
-          borderRadius: '5px 5px 0 0',
-        },
-      },
-      '& .MuiTabs-indicator': {
-        display: 'none', // Hide default indicator
-      },
-    }}
-  >
+          <Box sx={{ mt: 4, pl: 2, pr: 2 }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              sx={{
+                maxWidth: '1200px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                '& .MuiTab-root': {
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  color: '#000',
+                  minWidth: '150px',
+                  padding: '12px 16px',
+                  border: 'none',
+                  transition: 'color 0.3s ease',
+                  '&.Mui-selected': {
+                    color: '#fff',
+                    backgroundColor: '#91B508',
+                    borderRadius: '5px 5px 0 0',
+                  },
+                },
+                '& .MuiTabs-indicator': {
+                  display: 'none',
+                },
+              }}
+            >
+              <Tab label="Main Models" />
+              <Tab label="Experimental Models" />
+            </Tabs>
 
-    <Tab label="Main Models" />
-    <Tab label="Experimental Models" />
-  </Tabs>
-
-  <Box
-    sx={{
-      height: '4px',
-      backgroundColor: '#91B508',
-      width: '100%',
-      maxWidth: '1200px',
-      margin: '0 auto',
-      mt: '-4px', // Bring the line up to touch the tab
-    }}
-  />
-</Box>
+            <Box
+              sx={{
+                height: '4px',
+                backgroundColor: '#91B508',
+                width: '100%',
+                maxWidth: '1200px',
+                margin: '0 auto',
+                mt: '-4px',
+              }}
+            />
+          </Box>
 
           <TabPanel value={tabValue} index={0}>
             <Grid
               container
-              columns={5}
+              columns={{ xs: 1, sm: 5 }}
               rowSpacing={8}
               columnSpacing={3}
               sx={{ maxWidth: 1200, margin: '0 auto' }}
@@ -294,7 +322,7 @@ export default function SelectProgram() {
           <TabPanel value={tabValue} index={1}>
             <Grid
               container
-              columns={5}
+              columns={{ xs: 1, sm: 5 }}
               rowSpacing={8}
               columnSpacing={3}
               sx={{ maxWidth: 1200, margin: '0 auto' }}
@@ -306,7 +334,7 @@ export default function SelectProgram() {
       ) : hasMain ? (
         <Grid
           container
-          columns={5}
+          columns={{ xs: 1, sm: 5 }}
           rowSpacing={8}
           columnSpacing={3}
           sx={{ maxWidth: 1200, margin: '0 auto', mt: 2 }}
@@ -316,7 +344,7 @@ export default function SelectProgram() {
       ) : hasExperimental ? (
         <Grid
           container
-          columns={5}
+          columns={{ xs: 1, sm: 5 }}
           rowSpacing={8}
           columnSpacing={3}
           sx={{ maxWidth: 1200, margin: '0 auto', mt: 2 }}
@@ -339,23 +367,10 @@ export default function SelectProgram() {
     </Box>
   )
 }
-
-function extractModelData(item) {
-  const modelId = item?.id
-  const modelTitle = item?.title?.rendered || 'No Title'
-  let legoHeader = ''
-  if (Array.isArray(item.single_model_lego_color) && item.single_model_lego_color[0]) {
-    legoHeader = item.single_model_lego_color[0]
-  } else if (item.acf?.single_model_lego_color?.url) {
-    legoHeader = item.acf.single_model_lego_color.url
-  }
-  let image = item.small_image || item.acf?.small_image?.url || '/images/placeholder.png'
-  let lessonPassword = item.acf?.lesson_password || ''
-  return {
-    id: modelId,
-    title: modelTitle,
-    legoHeader,
-    image,
-    lessonPassword,
-  }
+SelectProgram.getLayout = page => {
+  return (
+    <UserLayout pageTitle='Select Model'showIcons>
+      {page}
+    </UserLayout>
+  )
 }

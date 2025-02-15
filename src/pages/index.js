@@ -15,9 +15,8 @@ const Dashboard = () => {
 
   return (
     <ApexChartWrapper>
-      <Grid container spacing={6}>
-        {/* Your Dashboard content */}
-      </Grid>
+
+    
     </ApexChartWrapper>
   )
 }

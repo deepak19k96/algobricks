@@ -23,7 +23,6 @@ export const UserProfileProvider = ({ children }) => {
       localStorage?.getItem('accessToken') !== '' &&
       (userProfile?.email === null || userProfile?.email === undefined)
     ) {
-      dispatch(getUserProfileAsync())
     } else {
       router.push('/pages/login')
     }
