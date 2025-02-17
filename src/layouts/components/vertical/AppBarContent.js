@@ -158,7 +158,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
             {showIcons && (
               <Box sx={{ mb: 1 }}>
                 <IconButton
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/buildinginstruction')}
                   sx={{ color: '#fff', mr: 2 }}
                 >
                   <svg

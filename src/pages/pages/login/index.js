@@ -98,8 +98,8 @@ const LoginPage = () => {
         position: 'relative',
         width: '100vw',
         height: '100vh',
-        backgroundImage:
-          'url("https://online.youngengineers.org/static/media/LoginBackground.e7741a88.jpg")',
+        backgroundImage: 'url(/images/mainbg.jpg)',
+
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -140,7 +140,7 @@ const LoginPage = () => {
 >
   <Box
     component="img"
-    src="https://online.youngengineers.org/static/media/young_engineers_logo.6c123553.png"
+    src="/images/logomain-1.png"
     alt="Young Engineers Logo"
     sx={{
       width: { xs: 80, sm: 'auto' },
@@ -150,7 +150,7 @@ const LoginPage = () => {
   />
   <Box
     component="img"
-    src="https://online.youngengineers.org/static/media/online_logo.4543131d.png"
+    src="/images/logomain-2.png"
     alt="Young Engineers Online Logo"
     sx={{
       width: { xs: 100, sm: 'auto' },

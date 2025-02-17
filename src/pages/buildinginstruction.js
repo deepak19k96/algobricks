@@ -43,7 +43,7 @@ const BuildingInstruction = () => {
         width: '100%',
         minHeight: '100%',
         backgroundImage:
-          'url("https://online.youngengineers.org/static/media/select_program.a29bba9c.jpg")',
+          'url("/images/buildinginstruction.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -56,7 +56,7 @@ const BuildingInstruction = () => {
           {instructions.map(item => (
             <Grid item key={item.id}>
               <Card
-                onClick={() => router.push(`/selectprogram/${item.id}`)}
+                onClick={() => router.push(`/model/${item.id}`)}
                 sx={{
                   width: 350,
                   height: 250,

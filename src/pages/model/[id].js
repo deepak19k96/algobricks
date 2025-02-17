@@ -210,7 +210,7 @@ console.log('backgroundImageUrl', backgroundImageUrl);
 
     const handleClick = () => {
       dispatch(setBackgroundImageUrl(backgroundImageUrl))
-      router.push(`/selectprogram/${id}/${modelId}`)
+      router.push(`/model/${id}/${modelId}`)
     }
 
     return (
