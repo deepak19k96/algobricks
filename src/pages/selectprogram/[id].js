@@ -135,38 +135,50 @@ export default function SelectProgram() {
   }
 
   // Compute the backgroundImageUrl from instructions data
-  const firstChild = mainModels[0] || experimentalModels[0] || {}
-  let lessonProgramRelation = ''
+  const firstChild = mainModels[0] || experimentalModels[0] || {};
+  console.log('firstChild', firstChild);
+  
+  let lessonProgramRelation = '';
   if (firstChild.link) {
-    const parts = firstChild.link.split('/')
-    const idx = parts.indexOf('programsparent')
+    const parts = firstChild.link.split('/');
+    console.log('parts', parts);
+  
+    // Look for "packages-parent" in the URL parts
+    const idx = parts.indexOf('packages-parent');
+    console.log('Index of "packages-parent":', idx);
+    
+    // Get the element immediately following "packages-parent"
     if (idx !== -1 && parts.length > idx + 1) {
-      lessonProgramRelation = parts[idx + 1]
+      lessonProgramRelation = parts[idx + 1];
     }
   }
-
+  
+  console.log('Extracted lessonProgramRelation:', lessonProgramRelation);
+  
   let backgroundImageUrl = ''
   let programLogoUrl = ''
 
   if (lessonProgramRelation && instructions && instructions.length > 0) {
     const matchingInstruction = instructions.find(inst =>
+
       inst.slug.toLowerCase().trim() === lessonProgramRelation.toLowerCase().trim()
     )
+
     if (matchingInstruction) {
-      backgroundImageUrl = Array.isArray(matchingInstruction.program_desktop_backgroung)
-        ? matchingInstruction.program_desktop_backgroung[0]
-        : matchingInstruction.program_desktop_backgroung
+      backgroundImageUrl = Array.isArray(matchingInstruction.package_desktop_background)
+        ? matchingInstruction.package_desktop_background[0]
+        : matchingInstruction.package_desktop_background
     }
-    if (matchingInstruction?.program_logo) {
-      programLogoUrl = Array.isArray(matchingInstruction.program_logo)
-        ? matchingInstruction.program_logo[0]
-        : matchingInstruction.program_logo
+    if (matchingInstruction?.package_logo) {
+      programLogoUrl = Array.isArray(matchingInstruction.package_logo)
+        ? matchingInstruction.package_logo[0]
+        : matchingInstruction.package_logo
     }
   }
   if (!backgroundImageUrl) {
     backgroundImageUrl = 'https://via.placeholder.com/1920x1080?text=No+Background+Image'
   }
-
+console.log('backgroundImageUrl', backgroundImageUrl);
   // Determine if we have any main or experimental models
   const hasMain = mainModels.length > 0
   const hasExperimental = experimentalModels.length > 0
