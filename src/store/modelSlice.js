@@ -9,10 +9,10 @@ export const fetchModelData = createAsyncThunk(
       const response = await axiosInstance.get(`wp-json/wp/v2/pages/${modelId}`)
       const data = response.data
 
-      // Transform lesson_0_gallery images for react-image-gallery
+      // Transform model_0_gallery images for react-image-gallery
       let galleryImages = []
-      if (data.lesson_0_gallery && Array.isArray(data.lesson_0_gallery)) {
-        galleryImages = data.lesson_0_gallery.map((url) => ({
+      if (data.model_0_gallery && Array.isArray(data.model_0_gallery)) {
+        galleryImages = data.model_0_gallery.map((url) => ({
           original: url,
           thumbnail: url,
         }))
@@ -27,6 +27,7 @@ export const fetchModelData = createAsyncThunk(
     }
   }
 )
+
 
 const modelSlice = createSlice({
   name: 'model',
