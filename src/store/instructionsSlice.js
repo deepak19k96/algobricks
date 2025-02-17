@@ -7,7 +7,7 @@ export const fetchInstructions = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        '/db/wp-json/wp/v2/pages?parent=127&per_page=100'
+        'wp-json/wp/v2/pages?parent=42&per_page=100'
       )
       return response.data
     } catch (error) {

@@ -47,12 +47,12 @@ const BuildingInstruction = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
-        marginTop: '60px',
+        marginTop: { xs: '30px', sm: '50px' }, // 30px for mobile, 50px for larger screens
         py: 4
       }}
     >
-      <Box sx={{ width: 1000, mx: 'auto' }}>
-        <Grid container rowSpacing={15} columnSpacing={15} justifyContent='center'>
+      <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto', px: { xs: 2, md: 0 } }}>
+      <Grid container rowSpacing={15} columnSpacing={15} justifyContent='center'>
           {instructions.map(item => (
             <Grid item key={item.id}>
               <Card
@@ -110,8 +110,8 @@ const BuildingInstruction = () => {
                 >
                   <img
                     src={
-                      item.program_logo
-                        ? item.program_logo[0]
+                      item.package_logo
+                        ? item.package_logo[0]
                         : 'https://via.placeholder.com/150'
                     }
                     alt={item.title.rendered}

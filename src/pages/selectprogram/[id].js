@@ -30,6 +30,10 @@ function TabPanel(props) {
 // Styled components for the card layout
 const ModelCard = styled(Box)(({ theme }) => ({
   width: 185,
+  [theme.breakpoints.down('sm')]: {
+    width: '60%', // Use 90% of the container's width on mobile
+    margin: 'auto', // Center the card
+  },
   borderRadius: 8,
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
   overflow: 'hidden',
@@ -41,8 +45,11 @@ const ModelCard = styled(Box)(({ theme }) => ({
   },
 }))
 
-const LegoHeader = styled(Box)(({ background }) => ({
+const LegoHeader = styled(Box)(({ theme, background }) => ({
   height: 70,
+  [theme.breakpoints.down('sm')]: {
+    height: 50,
+  },
   width: '100%',
   backgroundImage: background ? `url(${background})` : 'none',
   backgroundSize: 'cover',
@@ -61,8 +68,11 @@ const ModelImageContainer = styled(Box)(() => ({
   justifyContent: 'center',
 }))
 
-const CodeFooter = styled(Box)(() => ({
+const CodeFooter = styled(Box)(({ theme }) => ({
   height: 65,
+  [theme.breakpoints.down('sm')]: {
+    height: 80,
+  },
   width: '100%',
   backgroundColor: '#91B508',
   display: 'flex',
@@ -172,7 +182,7 @@ export default function SelectProgram() {
       legoHeader = item.acf.single_model_lego_color.url
     }
     let image = item.small_image || item.acf?.small_image?.url || '/images/placeholder.png'
-    let lessonPassword = item.acf?.lesson_password || ''
+    let lessonPassword = item.metadata?.model_password || ''
 
     return {
       id: modelId,
@@ -193,7 +203,12 @@ export default function SelectProgram() {
     }
 
     return (
-      <Grid item xs={1} key={modelId}>
+      <Grid
+        item
+        xs={1}
+        key={modelId}
+        sx={{ display: 'flex', justifyContent: 'center' }} // Center the card
+      >
         <ModelCard onClick={handleClick}>
           <LegoHeader background={legoHeader}>
             <Typography
@@ -250,6 +265,7 @@ export default function SelectProgram() {
         backgroundAttachment: 'fixed',
         marginTop: '60px',
         py: 4,
+        overflowX: 'hidden', // Prevent horizontal scrolling
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
@@ -302,7 +318,7 @@ export default function SelectProgram() {
                 height: '4px',
                 backgroundColor: '#91B508',
                 width: '100%',
-                maxWidth: '1200px',
+                maxWidth: { xs: '100%', sm: 1200 },
                 margin: '0 auto',
                 mt: '-4px',
               }}
@@ -315,7 +331,11 @@ export default function SelectProgram() {
               columns={{ xs: 1, sm: 5 }}
               rowSpacing={8}
               columnSpacing={3}
-              sx={{ maxWidth: 1200, margin: '0 auto' }}
+              sx={{
+                width: '100%',
+                maxWidth: { xs: '100%', sm: 1200 },
+                margin: '0 auto',
+              }}
             >
               {mainModels.map(renderModelCard)}
             </Grid>
@@ -326,7 +346,11 @@ export default function SelectProgram() {
               columns={{ xs: 1, sm: 5 }}
               rowSpacing={8}
               columnSpacing={3}
-              sx={{ maxWidth: 1200, margin: '0 auto' }}
+              sx={{
+                width: '100%',
+                maxWidth: { xs: '100%', sm: 1200 },
+                margin: '0 auto',
+              }}
             >
               {experimentalModels.map(renderModelCard)}
             </Grid>
@@ -338,7 +362,12 @@ export default function SelectProgram() {
           columns={{ xs: 1, sm: 5 }}
           rowSpacing={8}
           columnSpacing={3}
-          sx={{ maxWidth: 1200, margin: '0 auto', mt: 2 }}
+          sx={{
+            width: '100%',
+            maxWidth: { xs: '100%', sm: 1200 },
+            margin: '0 auto',
+            mt: 2,
+          }}
         >
           {mainModels.map(renderModelCard)}
         </Grid>
@@ -348,7 +377,12 @@ export default function SelectProgram() {
           columns={{ xs: 1, sm: 5 }}
           rowSpacing={8}
           columnSpacing={3}
-          sx={{ maxWidth: 1200, margin: '0 auto', mt: 2 }}
+          sx={{
+            width: '100%',
+            maxWidth: { xs: '100%', sm: 1200 },
+            margin: '0 auto',
+            mt: 2,
+          }}
         >
           {experimentalModels.map(renderModelCard)}
         </Grid>
@@ -356,10 +390,10 @@ export default function SelectProgram() {
         <Typography
           variant="h6"
           sx={{
-            color: '#fff',
+            color: 'black',
             textAlign: 'center',
             mt: 4,
-            textShadow: '0 0 5px rgba(0, 0, 0, 0.8)',
+
           }}
         >
           No models found.
@@ -370,10 +404,8 @@ export default function SelectProgram() {
 }
 
 SelectProgram.getLayout = page => {
-
   return (
-
-    <UserLayout pageTitle='Select Model' showIcons>
+    <UserLayout pageTitle="Select Model" showIcons>
       {page}
     </UserLayout>
   )

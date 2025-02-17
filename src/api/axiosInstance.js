@@ -3,7 +3,7 @@ import axios from 'axios'
 const siteUrl = process.env.NEXT_PUBLIC_API_URL
 
 const axiosInstance = axios.create({
-  baseURL: siteUrl || 'https://online.youngengineers.org', // Replace this with your base URL
+  baseURL: siteUrl || 'https://algobrixbackers.youngengineers.org/api/', // Replace this with your base URL
   timeout: 10000 // Optional timeout configuration
   // You can also add other default configurations here
 })

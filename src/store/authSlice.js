@@ -28,20 +28,23 @@ export const updateUserProfileAsync = createAsyncThunk('users/updateUser/id', as
   return response
 })
 
-export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue, dispatch }) => {
-  try {
-    const response = await axiosInstance.post('db/wp-json/jwt-auth/v1/token', credentials)
+export const login = createAsyncThunk(
+  'auth/login',
+  async (credentials, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await axiosInstance.post('wp-json/jwt-auth/v1/token', credentials)
+      return response.data
+    } catch (error) {
+      // Get error message from response and strip HTML tags
+      let errorMessage = error.response?.data?.message || 'An error occurred'
+      errorMessage = errorMessage.replace(/<[^>]+>/g, '') // Remove HTML tags
 
-    return response.data
-  } catch (error) {
-    // Dispatch error message with 'error' severity
-    const errorMessage = error.response?.data?.message || 'An error occurred'
-
-    dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
-
-    return rejectWithValue(errorMessage)
+      // Dispatch snackbar error with 'error' severity
+      dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
+      return rejectWithValue(errorMessage)
+    }
   }
-})
+)
 
 export const registerUser = createAsyncThunk('auth/register', async (userData, { rejectWithValue, dispatch }) => {
   try {

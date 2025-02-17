@@ -6,7 +6,7 @@ export const fetchModelData = createAsyncThunk(
   'model/fetchModelData',
   async (modelId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/db/wp-json/wp/v2/pages/${modelId}`)
+      const response = await axiosInstance.get(`wp-json/wp/v2/pages/${modelId}`)
       const data = response.data
 
       // Transform lesson_0_gallery images for react-image-gallery
