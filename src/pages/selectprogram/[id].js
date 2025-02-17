@@ -179,7 +179,6 @@ export default function SelectProgram() {
     backgroundImageUrl = 'https://via.placeholder.com/1920x1080?text=No+Background+Image'
   }
 console.log('backgroundImageUrl', backgroundImageUrl);
-  // Determine if we have any main or experimental models
   const hasMain = mainModels.length > 0
   const hasExperimental = experimentalModels.length > 0
 

@@ -75,7 +75,9 @@ const LoginPage = () => {
   const onSubmit = async data => {
     if (!termsChecked) {
       setTermsError(true)
+      
       return
+
     }
 
     try {
