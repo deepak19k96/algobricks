@@ -114,23 +114,22 @@ const SelectProgramModel = () => {
           </Box>
         </Box>
 
-        {/* Custom thumbnail styling using styled-jsx (global) */}
-        <style jsx global>{`
-          .my-gallery .image-gallery-thumbnail {
+        <style jsx>{`
+          .my-gallery :global(.image-gallery-thumbnail) {
             border: 1px solid black;
             margin-right: 1px;
             padding: 2px;
             cursor: pointer;
           }
-          .my-gallery .image-gallery-thumbnail:last-child {
+          .my-gallery :global(.image-gallery-thumbnail:last-child) {
             margin-right: 0;
           }
-          .my-gallery .image-gallery-thumbnails {
+          .my-gallery :global(.image-gallery-thumbnails) {
             display: flex;
             gap: 10px;
           }
-          .my-gallery .image-gallery-thumbnail.active,
-          .my-gallery .image-gallery-thumbnail:hover {
+          .my-gallery :global(.image-gallery-thumbnail.active),
+          .my-gallery :global(.image-gallery-thumbnail:hover) {
             border: 4px solid rgb(59, 122, 224);
           }
         `}</style>
