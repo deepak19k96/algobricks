@@ -132,6 +132,7 @@ export default function SelectProgram() {
   const { items: instructions, loading: instructionsLoading } = useSelector(
     (state) => state.instructions
   )
+
   const { items: models, loading: modelsLoading } = useSelector(
     (state) => state.models
   )
@@ -283,9 +284,8 @@ export default function SelectProgram() {
   }
 
   return (
-    // Parent container set to relative
+
     <Box sx={{ position: 'relative' }}>
-      {/* Fixed background layer with default white background */}
       <Box
         sx={{
           position: 'fixed',

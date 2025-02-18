@@ -208,12 +208,5 @@ const SelectProgramModel = () => {
 SelectProgramModel.getLayout = (page) => (
   <DynamicUserLayout>{page}</DynamicUserLayout>
 )
+
 export default SelectProgramModel
-
-/**
- * Make sure Next.js (or your custom _app.js) 
- * passes the correct modelData into page.props. 
- * This getLayout function reads that data so 
- * your <UserLayout> can display the page title.
- */
-

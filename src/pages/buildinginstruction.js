@@ -24,7 +24,6 @@ const BuildingInstruction = () => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          // Use different background images based on breakpoint:
           backgroundImage: {
             xs: 'url("/images/mobilebgbuilding.jpg")',
             sm: 'url("/images/buildinginstruction.jpg")'
