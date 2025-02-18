@@ -198,6 +198,10 @@ export default function SelectProgram() {
     }
   }
 
+  if (!backgroundImageUrl) {
+    backgroundImageUrl = '/images/whitebg.jpeg'
+  }
+
   const hasMain = mainModels.length > 0
   const hasExperimental = experimentalModels.length > 0
 
@@ -284,7 +288,6 @@ export default function SelectProgram() {
   }
 
   return (
-
     <Box sx={{ position: 'relative' }}>
       <Box
         sx={{
