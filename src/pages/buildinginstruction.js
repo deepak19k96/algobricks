@@ -62,7 +62,7 @@ const BuildingInstruction = () => {
             <img
               src='/images/loader.gif'
               alt='Loading...'
-              style={{ width: 100, height: 100 }}
+              style={{ width: 100, height: 100 , marginTop:'300px'}}
             />
           </Box>
         )}
@@ -96,7 +96,7 @@ const BuildingInstruction = () => {
                     // Responsive dimensions for the card
                     width: { xs: 340, sm: 350 },
                     height: { xs: 260, sm: 250 },
-                    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
+                    boxShadow: '0 25px 10px 0 rgba(0, 0, 0, 0.2), 0 20px 30px 0 rgba(0, 0, 0, 0.19)',
                     borderRadius: 0,
                     transition: 'transform 0.3s ease',
                     '&:hover': {
