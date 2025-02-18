@@ -46,25 +46,19 @@ const BuildingInstruction = () => {
         {/* Loader Overlay */}
         {loading && (
           <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10,
-              backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            }}
-          >
-            <img
-              src='/images/loader.gif'
-              alt='Loading...'
-              style={{ width: 100, height: 100 , marginTop:'300px'}}
-            />
-          </Box>
+                 sx={{
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   minHeight: '100vh',
+                 }}
+               >
+                 <img
+                   src="/images/loader.gif"
+                   alt="Loading..."
+                   style={{ width: 100, height: 100 }}
+                 />
+               </Box>
         )}
 
         {/* Content Container */}
