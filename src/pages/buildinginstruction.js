@@ -16,43 +16,50 @@ const BuildingInstruction = () => {
     dispatch(fetchInstructions())
   }, [dispatch])
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh'
-        }}
-      >
-        <img
-          src='/images/loader.gif'
-          alt='Loading...'
-          style={{ width: 100, height: 100 }}
-        />
-      </Box>
-    )
-  }
-
-  if (error) return <div>Error: {error}</div>
-
   return (
     <Box
       sx={{
+        position: 'relative',
         width: '100%',
         minHeight: '100%',
-        backgroundImage:
-          'url("/images/buildinginstruction.jpg")',
+        backgroundImage: 'url("/images/buildinginstruction.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
-        marginTop: { xs: '30px', sm: '50px' }, // 30px for mobile, 50px for larger screens
+        marginTop: { xs: '30px', sm: '50px' },
         py: 4
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto', px: { xs: 2, md: 0 } }}>
-      <Grid container rowSpacing={15} columnSpacing={15} justifyContent='center'>
+      {/* Loader Overlay */}
+      {loading && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10, // make sure the loader is above the background and content
+            backgroundColor: 'rgba(255, 255, 255, 0.5)' // optional: add a semi-transparent background
+          }}
+        >
+          <img
+            src='/images/loader.gif'
+            alt='Loading...'
+            style={{ width: 100, height: 100 }}
+          />
+        </Box>
+      )}
+
+      {/* Content Container */}
+      <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto', px: { xs: 2, md: 0 }, position: 'relative', zIndex: 5 }}>
+        {/* Show error if exists and not loading */}
+        {error && !loading && <div>Error: {error}</div>}
+
+        <Grid container rowSpacing={15} columnSpacing={15} justifyContent='center'>
           {instructions.map(item => (
             <Grid item key={item.id}>
               <Card
@@ -60,7 +67,7 @@ const BuildingInstruction = () => {
                 sx={{
                   width: 350,
                   height: 250,
-                  boxShadow: 5,
+                  boxShadow: '0px 100px 100px rgba(0, 0, 0, 0.1)',
                   borderRadius: 2,
                   transition: 'transform 0.3s ease',
                   '&:hover': {
@@ -130,7 +137,7 @@ const BuildingInstruction = () => {
 // 2) Wrap your page with UserLayout and pass the pageTitle
 BuildingInstruction.getLayout = page => {
   return (
-    <UserLayout pageTitle='Select Program'>
+    <UserLayout pageTitle='Select Package'>
       {page}
     </UserLayout>
   )

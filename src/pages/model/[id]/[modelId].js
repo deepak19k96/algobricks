@@ -28,15 +28,12 @@ const SelectProgramModel = () => {
     }
   }, [modelId, dispatch])
 
-  // If background image is empty (e.g. after a refresh), try to fetch instructions
-  // and compute the background image based on modelData.link
+  // Compute the background image URL if needed
   useEffect(() => {
     if (modelData && !backgroundImageUrl) {
-      // If instructions haven't been fetched yet, dispatch the fetch
       if (!instructions || instructions.length === 0) {
         dispatch(fetchInstructions())
       } else {
-        // Extract the slug from modelData.link
         let lessonProgramRelation = ''
         if (modelData.link) {
           const parts = modelData.link.split('/')
@@ -46,7 +43,6 @@ const SelectProgramModel = () => {
           }
         }
 
-        // Find a matching instruction using the extracted slug
         let newBackgroundImageUrl = ''
         if (lessonProgramRelation) {
           const matchingInstruction = instructions.find(
@@ -63,7 +59,6 @@ const SelectProgramModel = () => {
           }
         }
 
-        // Fallback if no valid background image is found
         if (!newBackgroundImageUrl) {
           newBackgroundImageUrl =
             'https://via.placeholder.com/1920x1080?text=No+Background+Image'
@@ -117,7 +112,6 @@ const SelectProgramModel = () => {
           position: 'relative',
           width: '100%',
           minHeight: 'calc(100vh - 60px)', // Adjust for header height
-          pt: '20px', // Padding top to account for header
         }}
       >
         {/* Fixed background Box */}
@@ -136,15 +130,19 @@ const SelectProgramModel = () => {
           }}
         />
 
-        {/* Content container */}
-        <Box sx={{ py: 4, px: 2 }}>
+        {/* Image slider container (matching the example design) */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '10px',
+          }}
+        >
           <Box
             sx={{
-              maxWidth: { xs: '100%', sm: 600 },
-              margin: '0 auto',
+              width: 700,
               backgroundColor: '#fff',
-              p: 0,
-              borderRadius: 0,
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
             }}
           >
@@ -164,7 +162,7 @@ const SelectProgramModel = () => {
           </Box>
         </Box>
 
-        {/* Global thumbnail styling with media queries for responsiveness */}
+        {/* Inline global styling for ImageGallery thumbnails */}
         <GlobalStyles
           styles={{
             '.my-gallery .image-gallery-thumbnail': {

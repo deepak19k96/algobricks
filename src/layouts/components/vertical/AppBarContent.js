@@ -140,11 +140,11 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
               backgroundColor: '#91B508',
               color: '#fff',
               fontWeight: 500,
-              fontSize: '2rem',
+              fontSize: '1.3rem',
               borderRadius: '0 40px 40px 0',
               px: 3,
               // Use minHeight instead of a fixed height so the box can grow vertically if needed
-              minHeight: '75px',
+              minHeight: '70px',
               display: 'flex',
               alignItems: 'center',
               // Keep text on one line

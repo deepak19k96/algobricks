@@ -1,22 +1,29 @@
-// src/pages/selectprogram/[id]/index.jsx (or wherever your component lives)
+// src/pages/selectprogram/[id]/index.jsx
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Box, Typography, Tabs, Tab, Grid, Stack } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Grid,
+  Stack,
+  Skeleton
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchInstructions } from 'src/store/instructionsSlice' // Adjust the path as needed
-import { fetchChildPages } from 'src/store/modelsSlice' // Adjust the path as needed
+import { fetchInstructions } from 'src/store/instructionsSlice' // Adjust path as needed
+import { fetchChildPages } from 'src/store/modelsSlice' // Adjust path as needed
 import { setBackgroundImageUrl } from 'src/store/uiSlice' // Import our new action
 import UserLayout from 'src/layouts/UserLayout'
 
-// TabPanel Component
 function TabPanel(props) {
   const { children, value, index, ...other } = props
 
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -27,12 +34,11 @@ function TabPanel(props) {
   )
 }
 
-// Styled components for the card layout
 const ModelCard = styled(Box)(({ theme }) => ({
   width: 185,
   [theme.breakpoints.down('sm')]: {
-    width: '60%', // Use 90% of the container's width on mobile
-    margin: 'auto', // Center the card
+    width: '60%', 
+    margin: 'auto', 
   },
   borderRadius: 8,
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
@@ -80,7 +86,45 @@ const CodeFooter = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
 }))
 
-// Main Component
+function SkeletonCard() {
+  return (
+    <ModelCard sx={{ overflow: 'hidden' }}>
+      <Box
+        sx={{
+          height: { xs: 50, sm: 70 }, 
+          backgroundImage:
+            'url("/images/headerskelton.png")',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      <Box
+        sx={{
+          height: 100, 
+          backgroundImage:
+            'url("/images/skeltonbody.png")',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      <Box
+        sx={{
+          height: { xs: 80, sm: 65 }, 
+          backgroundImage:
+            'url("/images/skeltonfooter.png")',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+    </ModelCard>
+  )
+}
+
+
+
 export default function SelectProgram() {
   const router = useRouter()
   const { id } = router.query
@@ -111,57 +155,39 @@ export default function SelectProgram() {
   }, [dispatch, instructions])
 
   // Separate main and experimental models
-  const mainModels = models.filter(item => !item?.acf?.experimental_model)
-  const experimentalModels = models.filter(item => item?.acf?.experimental_model)
+  const mainModels = models.filter((item) => !item?.acf?.experimental_model)
+  const experimentalModels = models.filter((item) => item?.acf?.experimental_model)
 
-  // Show a loading indicator while fetching data
-  if (modelsLoading || instructionsLoading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <img src="/images/loader.gif" alt="Loading..." style={{ width: 100, height: 100 }} />
-      </Box>
-    )
-  }
+  // Prepare skeleton placeholders
+  // (Feel free to adjust how many skeletons to show. 
+  //  This example shows 5 skeletons per row, for a total of 10.)
+  const skeletonArray = Array.from({ length: 10 }, (_, i) => i)
 
+  // ---------------
+  // Handle tab
+  // ---------------
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue)
   }
 
-  // Compute the backgroundImageUrl from instructions data
-  const firstChild = mainModels[0] || experimentalModels[0] || {};
-  console.log('firstChild', firstChild);
-  
-  let lessonProgramRelation = '';
+  // Compute background image from instructions data
+  const firstChild = mainModels[0] || experimentalModels[0] || {}
+  let lessonProgramRelation = ''
   if (firstChild.link) {
-    const parts = firstChild.link.split('/');
-    console.log('parts', parts);
-  
-    // Look for "packages-parent" in the URL parts
-    const idx = parts.indexOf('packages-parent');
-    console.log('Index of "packages-parent":', idx);
-    
-    // Get the element immediately following "packages-parent"
+    const parts = firstChild.link.split('/')
+    const idx = parts.indexOf('packages-parent')
     if (idx !== -1 && parts.length > idx + 1) {
-      lessonProgramRelation = parts[idx + 1];
+      lessonProgramRelation = parts[idx + 1]
     }
   }
-  
-  console.log('Extracted lessonProgramRelation:', lessonProgramRelation);
-  
+
   let backgroundImageUrl = ''
   let programLogoUrl = ''
 
   if (lessonProgramRelation && instructions && instructions.length > 0) {
-    const matchingInstruction = instructions.find(inst =>
-
-      inst.slug.toLowerCase().trim() === lessonProgramRelation.toLowerCase().trim()
+    const matchingInstruction = instructions.find(
+      (inst) =>
+        inst.slug.toLowerCase().trim() === lessonProgramRelation.toLowerCase().trim()
     )
 
     if (matchingInstruction) {
@@ -169,16 +195,14 @@ export default function SelectProgram() {
         ? matchingInstruction.package_desktop_background[0]
         : matchingInstruction.package_desktop_background
     }
+
     if (matchingInstruction?.package_logo) {
       programLogoUrl = Array.isArray(matchingInstruction.package_logo)
         ? matchingInstruction.package_logo[0]
         : matchingInstruction.package_logo
     }
   }
-  if (!backgroundImageUrl) {
-    backgroundImageUrl = 'https://via.placeholder.com/1920x1080?text=No+Background+Image'
-  }
-console.log('backgroundImageUrl', backgroundImageUrl);
+
   const hasMain = mainModels.length > 0
   const hasExperimental = experimentalModels.length > 0
 
@@ -204,26 +228,29 @@ console.log('backgroundImageUrl', backgroundImageUrl);
     }
   }
 
-  // Render a model card. On click, store backgroundImageUrl in Redux and navigate.
-  const renderModelCard = model => {
-    const { id: modelId, title, legoHeader, image, lessonPassword } = extractModelData(model)
+  // Render a model card
+  const renderModelCard = (model) => {
+    const { id: modelId, title, legoHeader, image, lessonPassword } =
+      extractModelData(model)
 
     const handleClick = () => {
+      // We set the background image in Redux
       dispatch(setBackgroundImageUrl(backgroundImageUrl))
       router.push(`/model/${id}/${modelId}`)
     }
+  
 
     return (
       <Grid
         item
         xs={1}
         key={modelId}
-        sx={{ display: 'flex', justifyContent: 'center' }} // Center the card
+        sx={{ display: 'flex', justifyContent: 'center' }}
       >
         <ModelCard onClick={handleClick}>
           <LegoHeader background={legoHeader}>
             <Typography
-              variant="subtitle1"
+              variant='subtitle1'
               sx={{
                 color: '#fff',
                 fontWeight: 500,
@@ -236,7 +263,7 @@ console.log('backgroundImageUrl', backgroundImageUrl);
           </LegoHeader>
           <ModelImageContainer>
             <Box
-              component="img"
+              component='img'
               src={image}
               alt={title}
               sx={{
@@ -246,9 +273,9 @@ console.log('backgroundImageUrl', backgroundImageUrl);
             />
           </ModelImageContainer>
           <CodeFooter>
-            <Stack direction="column" alignItems="center" spacing={-1}>
+            <Stack direction='column' alignItems='center' spacing={-1}>
               <Typography
-                variant="body1"
+                variant='body1'
                 sx={{
                   color: '#fff',
                   fontWeight: 'bold',
@@ -270,73 +297,134 @@ console.log('backgroundImageUrl', backgroundImageUrl);
       sx={{
         width: '100%',
         minHeight: '100%',
-        backgroundImage: `url(${backgroundImageUrl})`,
+        backgroundImage: modelsLoading || instructionsLoading ? 'none' : `url(${backgroundImageUrl})`,
+        backgroundColor: modelsLoading || instructionsLoading ? '#fff' : 'transparent',
+
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
         marginTop: '60px',
         py: 4,
-        overflowX: 'hidden', // Prevent horizontal scrolling
+        overflowX: 'hidden',
       }}
     >
+      {/* Program Logo (if any) */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
         {programLogoUrl && (
           <Box
-            component="img"
+            component='img'
             src={programLogoUrl}
-            alt="Program Logo"
+            alt='Program Logo'
             sx={{ maxWidth: '200px', height: 'auto' }}
           />
         )}
       </Box>
 
-      {hasMain && hasExperimental ? (
+      {/* If still loading, show Skeleton cards in the exact 5-column layout */}
+      {(modelsLoading || instructionsLoading) && (
+        <Grid
+          container
+          columns={{ xs: 1, sm: 5 }}
+          rowSpacing={8}
+          columnSpacing={3}
+          sx={{
+            width: '100%',
+            maxWidth: { xs: '100%', sm: 1200 },
+            margin: '0 auto',
+            mt: 2,
+          }}
+        >
+          {skeletonArray.map((item) => (
+            <Grid item xs={1} key={item} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <SkeletonCard />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      {/* If not loading, show the actual content */}
+      {!modelsLoading && !instructionsLoading && (
         <>
-          <Box sx={{ mt: 4, pl: 2, pr: 2 }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              sx={{
-                maxWidth: '1200px',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                '& .MuiTab-root': {
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  color: '#000',
-                  minWidth: '150px',
-                  padding: '12px 16px',
-                  border: 'none',
-                  transition: 'color 0.3s ease',
-                  '&.Mui-selected': {
-                    color: '#fff',
+          {/* If we have both Main and Experimental, show Tabs */}
+          {hasMain && hasExperimental ? (
+            <>
+              <Box sx={{ mt: 4, pl: 2, pr: 2 }}>
+                <Tabs
+                  value={tabValue}
+                  onChange={handleTabChange}
+                  sx={{
+                    maxWidth: '1200px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    '& .MuiTab-root': {
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      color: '#000',
+                      minWidth: '150px',
+                      padding: '12px 16px',
+                      border: 'none',
+                      transition: 'color 0.3s ease',
+                      '&.Mui-selected': {
+                        color: '#fff',
+                        backgroundColor: '#91B508',
+                        borderRadius: '5px 5px 0 0',
+                      },
+                    },
+                    '& .MuiTabs-indicator': {
+                      display: 'none',
+                    },
+                  }}
+                >
+                  <Tab label='Main Models' />
+                  <Tab label='Experimental Models' />
+                </Tabs>
+
+                <Box
+                  sx={{
+                    height: '4px',
                     backgroundColor: '#91B508',
-                    borderRadius: '5px 5px 0 0',
-                  },
-                },
-                '& .MuiTabs-indicator': {
-                  display: 'none',
-                },
-              }}
-            >
-              <Tab label="Main Models" />
-              <Tab label="Experimental Models" />
-            </Tabs>
+                    width: '100%',
+                    maxWidth: { xs: '100%', sm: 1200 },
+                    margin: '0 auto',
+                    mt: '-4px',
+                  }}
+                />
+              </Box>
 
-            <Box
-              sx={{
-                height: '4px',
-                backgroundColor: '#91B508',
-                width: '100%',
-                maxWidth: { xs: '100%', sm: 1200 },
-                margin: '0 auto',
-                mt: '-4px',
-              }}
-            />
-          </Box>
+              <TabPanel value={tabValue} index={0}>
+                <Grid
+                  container
+                  columns={{ xs: 1, sm: 5 }}
+                  rowSpacing={8}
+                  columnSpacing={3}
+                  sx={{
+                    width: '100%',
+                    maxWidth: { xs: '100%', sm: 1200 },
+                    margin: '0 auto',
+                  }}
+                >
+                  {mainModels.map(renderModelCard)}
+                </Grid>
+              </TabPanel>
 
-          <TabPanel value={tabValue} index={0}>
+              <TabPanel value={tabValue} index={1}>
+                <Grid
+                  container
+                  columns={{ xs: 1, sm: 5 }}
+                  rowSpacing={8}
+                  columnSpacing={3}
+                  sx={{
+                    width: '100%',
+                    maxWidth: { xs: '100%', sm: 1200 },
+                    margin: '0 auto',
+                  }}
+                >
+                  {experimentalModels.map(renderModelCard)}
+                </Grid>
+              </TabPanel>
+            </>
+          ) : hasMain ? (
             <Grid
               container
               columns={{ xs: 1, sm: 5 }}
@@ -346,12 +434,12 @@ console.log('backgroundImageUrl', backgroundImageUrl);
                 width: '100%',
                 maxWidth: { xs: '100%', sm: 1200 },
                 margin: '0 auto',
+                mt: 2,
               }}
             >
               {mainModels.map(renderModelCard)}
             </Grid>
-          </TabPanel>
-          <TabPanel value={tabValue} index={1}>
+          ) : hasExperimental ? (
             <Grid
               container
               columns={{ xs: 1, sm: 5 }}
@@ -361,62 +449,32 @@ console.log('backgroundImageUrl', backgroundImageUrl);
                 width: '100%',
                 maxWidth: { xs: '100%', sm: 1200 },
                 margin: '0 auto',
+                mt: 2,
               }}
             >
               {experimentalModels.map(renderModelCard)}
             </Grid>
-          </TabPanel>
+          ) : (
+            <Typography
+              variant='h6'
+              sx={{
+                color: 'black',
+                textAlign: 'center',
+                mt: 4,
+              }}
+            >
+              No models found.
+            </Typography>
+          )}
         </>
-      ) : hasMain ? (
-        <Grid
-          container
-          columns={{ xs: 1, sm: 5 }}
-          rowSpacing={8}
-          columnSpacing={3}
-          sx={{
-            width: '100%',
-            maxWidth: { xs: '100%', sm: 1200 },
-            margin: '0 auto',
-            mt: 2,
-          }}
-        >
-          {mainModels.map(renderModelCard)}
-        </Grid>
-      ) : hasExperimental ? (
-        <Grid
-          container
-          columns={{ xs: 1, sm: 5 }}
-          rowSpacing={8}
-          columnSpacing={3}
-          sx={{
-            width: '100%',
-            maxWidth: { xs: '100%', sm: 1200 },
-            margin: '0 auto',
-            mt: 2,
-          }}
-        >
-          {experimentalModels.map(renderModelCard)}
-        </Grid>
-      ) : (
-        <Typography
-          variant="h6"
-          sx={{
-            color: 'black',
-            textAlign: 'center',
-            mt: 4,
-
-          }}
-        >
-          No models found.
-        </Typography>
       )}
     </Box>
   )
 }
 
-SelectProgram.getLayout = page => {
+SelectProgram.getLayout = (page) => {
   return (
-    <UserLayout pageTitle="Select Model" showIcons>
+    <UserLayout pageTitle='Select Model' showIcons>
       {page}
     </UserLayout>
   )

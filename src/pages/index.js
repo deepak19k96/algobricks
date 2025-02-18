@@ -9,7 +9,11 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('accessToken')
     if (!token) {
+      // If the token doesn't exist, navigate to the login page
       router.push('/pages/login')
+    } else {
+      // If the token exists, navigate to the Building Instruction page
+      router.push('/buildinginstruction') // Ensure your route matches your file name
     }
   }, [router])
 
