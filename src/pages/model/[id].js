@@ -309,7 +309,7 @@ export default function SelectProgram() {
       <Box
         sx={{
           position: 'relative',
-          marginTop: isMobile ? 0 : '55px',
+          marginTop: isMobile ? '0px' : '55px',
           py: 4,
         }}
       >
