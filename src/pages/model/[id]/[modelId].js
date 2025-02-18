@@ -136,7 +136,7 @@ const SelectProgramModel = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: '10px',
+            marginTop: '5px',
           }}
         >
           <Box

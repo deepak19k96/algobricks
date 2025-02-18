@@ -8,8 +8,8 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing(0, 6),
-  backgroundColor: 'transparent',
-  color: theme.palette.text.primary,
+  backgroundColor: '#fff', // changed to white
+  color: '#fff', // changed to white
   minHeight: theme.mixins.toolbar.minHeight,
   [theme.breakpoints.down('sm')]: {
     paddingLeft: theme.spacing(4),
