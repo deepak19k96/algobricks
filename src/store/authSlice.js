@@ -2,31 +2,30 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosInstance from 'src/api/axiosInstance'
 import { setSnackbarMessage } from './snackbarSlice' // Import the action from snackbarSlice
 
-import { getUserProfile, updateUserProfile } from 'src/api/usersApi'
 
-export const getUserProfileAsync = createAsyncThunk(
-  'users/getUserProfile',
-  async (_, { rejectWithValue, dispatch }) => {
-    try {
-      const response = await getUserProfile()
+// export const getUserProfileAsync = createAsyncThunk(
+//   'users/getUserProfile',
+//   async (_, { rejectWithValue, dispatch }) => {
+//     try {
+//       const response = await getUserProfile()
 
-      return response
-    } catch (error) {
-      // Dispatch error message with 'error' severity
-      const errorMessage = error.response?.data?.message || 'An error occurred'
+//       return response
+//     } catch (error) {
+//       // Dispatch error message with 'error' severity
+//       const errorMessage = error.response?.data?.message || 'An error occurred'
 
-      dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
+//       dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
 
-      return rejectWithValue(errorMessage)
-    }
-  }
-)
+//       return rejectWithValue(errorMessage)
+//     }
+//   }
+// )
 
-export const updateUserProfileAsync = createAsyncThunk('users/updateUser/id', async user => {
-  const response = await updateUserProfile(user)
+// export const updateUserProfileAsync = createAsyncThunk('users/updateUser/id', async user => {
+//   const response = await updateUserProfile(user)
 
-  return response
-})
+//   return response
+// })
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -46,21 +45,21 @@ export const login = createAsyncThunk(
   }
 )
 
-export const registerUser = createAsyncThunk('auth/register', async (userData, { rejectWithValue, dispatch }) => {
-  try {
-    const response = await axiosInstance.post('/api/register', userData)
+// export const registerUser = createAsyncThunk('auth/register', async (userData, { rejectWithValue, dispatch }) => {
+//   try {
+//     const response = await axiosInstance.post('/api/register', userData)
 
-    return response.data
-  } catch (error) {
-    // Dispatch error message with 'error' severity
+//     return response.data
+//   } catch (error) {
+//     // Dispatch error message with 'error' severity
 
-    const errorMessage = error.response?.data?.message || 'An error occurred'
+//     const errorMessage = error.response?.data?.message || 'An error occurred'
 
-    dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
+//     dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
 
-    return rejectWithValue(errorMessage)
-  }
-})
+//     return rejectWithValue(errorMessage)
+//   }
+// })
 
 const authSlice = createSlice({
   name: 'auth',
@@ -87,34 +86,34 @@ const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(getUserProfileAsync.pending, state => {
-        state.isLoading = true
-        state.error = null
-      })
-      .addCase(getUserProfileAsync.fulfilled, (state, action) => {
-        state.user = action.payload.user
-        state.isAuthenticated = true
-        state.isLoading = false
-        state.error = null
-      })
-      .addCase(getUserProfileAsync.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.error.message
-      })
-      .addCase(updateUserProfileAsync.pending, state => {
-        state.isLoading = true
-        state.error = null
-      })
-      .addCase(updateUserProfileAsync.fulfilled, (state, action) => {
-        state.user = action.payload.user
-        state.isAuthenticated = true
-        state.isLoading = false
-        state.error = null
-      })
-      .addCase(updateUserProfileAsync.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.error.message
-      })
+      // .addCase(getUserProfileAsync.pending, state => {
+      //   state.isLoading = true
+      //   state.error = null
+      // })
+      // .addCase(getUserProfileAsync.fulfilled, (state, action) => {
+      //   state.user = action.payload.user
+      //   state.isAuthenticated = true
+      //   state.isLoading = false
+      //   state.error = null
+      // })
+      // .addCase(getUserProfileAsync.rejected, (state, action) => {
+      //   state.isLoading = false
+      //   state.error = action.error.message
+      // })
+      // .addCase(updateUserProfileAsync.pending, state => {
+      //   state.isLoading = true
+      //   state.error = null
+      // })
+      // .addCase(updateUserProfileAsync.fulfilled, (state, action) => {
+      //   state.user = action.payload.user
+      //   state.isAuthenticated = true
+      //   state.isLoading = false
+      //   state.error = null
+      // })
+      // .addCase(updateUserProfileAsync.rejected, (state, action) => {
+      //   state.isLoading = false
+      //   state.error = action.error.message
+      // })
       .addCase(login.pending, state => {
         state.isLoading = true
         state.error = null
@@ -131,22 +130,22 @@ const authSlice = createSlice({
         state.isLoading = false
         state.error = action.error.message
       })
-      .addCase(registerUser.pending, state => {
-        state.isLoading = true
-        state.error = null
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.token = action.payload.token
-        state.user = action.payload.user
-        state.isAuthenticated = true
-        state.isLoading = false
-        state.error = null
-        localStorage.setItem('accessToken', action.payload.token)
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.error.message
-      })
+      // .addCase(registerUser.pending, state => {
+      //   state.isLoading = true
+      //   state.error = null
+      // })
+      // .addCase(registerUser.fulfilled, (state, action) => {
+      //   state.token = action.payload.token
+      //   state.user = action.payload.user
+      //   state.isAuthenticated = true
+      //   state.isLoading = false
+      //   state.error = null
+      //   localStorage.setItem('accessToken', action.payload.token)
+      // })
+      // .addCase(registerUser.rejected, (state, action) => {
+      //   state.isLoading = false
+      //   state.error = action.error.message
+      // })
   }
 })
 
