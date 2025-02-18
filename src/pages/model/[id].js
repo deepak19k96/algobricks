@@ -470,7 +470,7 @@ export default function SelectProgram() {
                   mt: 4,
                 }}
               >
-                Record not found!.
+                Record not found!
               </Typography>
             )}
           </>
