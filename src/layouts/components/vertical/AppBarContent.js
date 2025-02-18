@@ -53,9 +53,9 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
             <Box
               sx={{
                 backgroundColor: '#91B508',
-                py: 2,
+                py: 5,
                 borderRadius: '0 40px 40px 0',
-                px: 3,
+                px: 5,
                              display: 'flex',
                 alignItems: 'center',
                 whiteSpace: 'nowrap'
@@ -65,7 +65,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
                 sx={{
                   color: '#fff',
                   fontWeight: 500,
-                  fontSize: '1rem'
+                  fontSize: '1.1rem'
                 }}
               >
                 Hi {userName}

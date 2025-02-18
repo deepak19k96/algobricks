@@ -95,8 +95,8 @@ const BuildingInstruction = () => {
                   onClick={() => router.push(`/model/${item.id}`)}
                   sx={{
                     // Responsive dimensions for the card
-                    width: { xs: 300, sm: 350 },
-                    height: { xs: 200, sm: 250 },
+                    width: { xs: 340, sm: 350 },
+                    height: { xs: 260, sm: 250 },
                     boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
                     borderRadius: 0,
                     transition: 'transform 0.3s ease',
@@ -140,7 +140,7 @@ const BuildingInstruction = () => {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      height: { xs: 130, sm: 180 },
+                      height: { xs: 200, sm: 180 },
                       backgroundColor: '#F5F5F5',
                       padding: '10px',
                     }}
