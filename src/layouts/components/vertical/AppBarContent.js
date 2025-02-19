@@ -27,8 +27,8 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
           // Make height smaller since icons/title have moved out
           height: isMobile ? '100px' : '120px',
           zIndex: 1100,
-          backgroundImage: isMobile? 'url("/images/navbarmobile.jpeg")':
-            'url("https://online.youngengineers.org/static/media/Header_admin.9c76f9b7.jpg")',
+          backgroundImage: isMobile? 'url("/images/navbarmobile-2.jpeg")':
+            'url("/images/navbardesktop.jpeg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           display: 'flex',

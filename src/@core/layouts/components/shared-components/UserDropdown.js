@@ -77,7 +77,7 @@ const UserDropdown = () => {
       {/* The gear icon that opens the menu */}
       <Box onClick={handleDropdownOpen} sx={{ ml: 2, cursor: 'pointer' }}>
         {/* Responsive CogOutline icon: smaller on mobile, larger on desktop */}
-        <CogOutline sx={{ fontSize: { xs: '2rem', sm: '4rem' }, color: 'white' }} />
+        <CogOutline sx={{ fontSize: { xs: '3rem', sm: '4rem' }, color: 'white' }} />
       </Box>
 
       <Menu

@@ -269,16 +269,7 @@ export default function SelectProgram() {
           </ModelImageContainer>
           <CodeFooter>
             <Stack direction="column" alignItems="center" spacing={-1}>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: '#fff',
-                  fontWeight: 'bold',
-                  mt: 1,
-                }}
-              >
-                {lessonPassword}
-              </Typography>
+             
               <PlayArrowIcon sx={{ color: '#fff', fontSize: 40 }} />
             </Stack>
           </CodeFooter>

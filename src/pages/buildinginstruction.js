@@ -36,61 +36,27 @@ const BuildingInstruction = () => {
       />
 
       {/* Scrollable content layer */}
-      <Box
-        sx={{
-          position: 'relative',
-          marginTop: { xs: '0px', sm: '50px' },
-          py: 4,
-        }}
-      >
+      <Box sx={{ position: 'relative', marginTop: { xs: '0px', sm: '80px' }, py: 4 }}>
         {/* Loader Overlay */}
         {loading && (
-          <Box
-                 sx={{
-                   display: 'flex',
-                   alignItems: 'center',
-                   justifyContent: 'center',
-                   minHeight: '100vh',
-                 }}
-               >
-                 <img
-                   src="/images/loader.gif"
-                   alt="Loading..."
-                   style={{ width: 100, height: 100 }}
-                 />
-               </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+            <img src="/images/loader.gif" alt="Loading..." style={{ width: 100, height: 100 }} />
+          </Box>
         )}
 
         {/* Content Container */}
-        <Box
-          sx={{
-            width: '100%',
-            maxWidth: 1000,
-            mx: 'auto',
-            px: { xs: 2, md: 0 },
-            position: 'relative',
-            zIndex: 5,
-          }}
-        >
+        <Box sx={{ width: '100%', maxWidth: 900, mx: 'auto', px: { xs: 2, md: 0 }, position: 'relative', zIndex: 5 }}>
           {error && !loading && <div>Error: {error}</div>}
 
-          <Grid container rowSpacing={15} columnSpacing={15} justifyContent='center'>
+          <Grid container rowSpacing={10} columnSpacing={10} justifyContent="center">
             {instructions.map((item) => (
-              <Grid
-                item
-                key={item.id}
-                sx={{
-                  // Center the card in mobile view
-                  mx: { xs: 'auto', sm: 0 },
-                }}
-              >
+              <Grid item key={item.id} sx={{ mx: { xs: 'auto', sm: 0 } }}>
                 <Card
                   onClick={() => router.push(`/model/${item.id}`)}
                   sx={{
-                    // Responsive dimensions for the card
-                    width: { xs: 340, sm: 350 },
-                    height: { xs: 260, sm: 250 },
-                    boxShadow: '0 25px 10px 0 rgba(0, 0, 0, 0.2), 0 20px 30px 0 rgba(0, 0, 0, 0.19)',
+                    width: { xs: 280, sm: 320 }, // Reduced width
+                    height: { xs: 220, sm: 230 }, // Reduced height
+                    boxShadow: '0 15px 8px rgba(0, 0, 0, 0.15), 0 10px 25px rgba(0, 0, 0, 0.15)',
                     borderRadius: 0,
                     transition: 'transform 0.3s ease',
                     '&:hover': {
@@ -99,53 +65,51 @@ const BuildingInstruction = () => {
                     },
                   }}
                 >
+                  {/* LEGO Header */}
                   <Box
                     sx={{
                       position: 'relative',
-                      height: 70,
+                      height: 60, // Reduced height
                       backgroundImage: `url(${item.lego_long || ''})`,
                       backgroundSize: 'contain',
                       backgroundRepeat: 'no-repeat',
                       backgroundPosition: 'center',
                       borderTopLeftRadius: 8,
                       borderTopRightRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
                     <Typography
-                      variant='h6'
+                      variant="h6"
                       sx={{
-                        position: 'absolute',
-                        bottom: 10,
-                        left: 0,
-                        right: 0,
                         textAlign: 'center',
                         color: '#fff',
                         fontWeight: 700,
-                        fontSize: '16px',
+                        fontSize: '14px',
                         textShadow: '0 0 5px rgba(0, 0, 0, 0.8)',
+                        whiteSpace: 'nowrap',
                       }}
                       dangerouslySetInnerHTML={{ __html: item.title.rendered }}
                     />
                   </Box>
 
+                  {/* Package Logo */}
                   <CardContent
                     sx={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      height: { xs: 200, sm: 180 },
+                      height: { xs: 160, sm: 170 }, // Adjusted height
                       backgroundColor: '#F5F5F5',
-                      padding: '10px',
+                      padding: '14px',
                     }}
                   >
                     <img
-                      src={
-                        item.package_logo
-                          ? item.package_logo[0]
-                          : 'https://via.placeholder.com/150'
-                      }
+                      src={item.package_logo ? item.package_logo[0] : 'https://via.placeholder.com/150'}
                       alt={item.title.rendered}
-                      style={{ maxWidth: '100%', maxHeight: '100%' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }} // Full width and visible
                     />
                   </CardContent>
                 </Card>
@@ -160,11 +124,7 @@ const BuildingInstruction = () => {
 
 // Wrap the page with UserLayout and pass the pageTitle
 BuildingInstruction.getLayout = (page) => {
-  return (
-    <UserLayout pageTitle='Select Package'>
-      {page}
-    </UserLayout>
-  )
+  return <UserLayout pageTitle="Select Package">{page}</UserLayout>
 }
 
 export default BuildingInstruction
