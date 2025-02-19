@@ -48,7 +48,7 @@ const BuildingInstruction = () => {
         <Box sx={{ width: '100%', maxWidth: 900, mx: 'auto', px: { xs: 2, md: 0 }, position: 'relative', zIndex: 5 }}>
           {error && !loading && <div>Error: {error}</div>}
 
-          <Grid container rowSpacing={10} columnSpacing={10} justifyContent="center">
+          <Grid container rowSpacing={15} columnSpacing={10} justifyContent="center">
             {instructions.map((item) => (
               <Grid item key={item.id} sx={{ mx: { xs: 'auto', sm: 0 } }}>
                 <Card
