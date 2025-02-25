@@ -137,6 +137,7 @@ export default function SelectProgram() {
   const { items: models, loading: modelsLoading } = useSelector(
     (state) => state.models
   )
+  
   const { data: userData, loading: userLoading, error: userError } = useSelector(
     (state) => state.user
   )

@@ -9,13 +9,31 @@ import DynamicUserLayout from 'src/@core/layouts/DynamicUserLayout'
 import { fetchModelData } from 'src/store/modelSlice'
 import { fetchInstructions } from 'src/store/instructionsSlice'
 import { setBackgroundImageUrl } from 'src/store/uiSlice'
+import { fetchUserData } from 'src/store/userDataSlice'
 
 const SelectProgramModel = () => {
   const router = useRouter()
-  const { modelId } = router.query
+  const { id, modelId } = router.query
   const dispatch = useDispatch()
 
-  // Pull data from Redux
+  const { data: userData, loading: userLoading, error: userError } = useSelector(
+    (state) => state.user
+  )
+  useEffect(() => {
+    if (!userData) {
+      dispatch(fetchUserData())
+    }
+  }, [userData, dispatch])
+  useEffect(() => {
+    if (id && userData && userData.package_data) {
+      const allowedPackages = userData.package_data.map((p) => Number(p))
+      if (!allowedPackages.includes(Number(id))) {
+        // Redirect if the package id is not allowed
+        router.replace('/buildinginstruction') // or any other route you'd prefer
+      }
+    }
+  }, [id, userData, router])
+  
   const { modelData, galleryImages, loading, error } = useSelector(
     state => state.model
   )
