@@ -6,6 +6,7 @@ import instructionsReducer from './instructionsSlice'
 import modelsReducer from './modelsSlice' // New slice
 import uiReducer from './uiSlice' // <-- Import your ui slice reducer
 import modelReducer from './modelSlice'   // New slice for model data
+import userDataReducer from './userDataSlice'
 
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     instructions: instructionsReducer,
     models: modelsReducer,  // Add the new reducer
     model: modelReducer, // <-- Added here
+    user: userDataReducer,
 
     snackbar: snackbarReducer,
 

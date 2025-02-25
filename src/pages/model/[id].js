@@ -17,6 +17,7 @@ import { fetchInstructions } from 'src/store/instructionsSlice'
 import { fetchChildPages } from 'src/store/modelsSlice'
 import { setBackgroundImageUrl } from 'src/store/uiSlice'
 import UserLayout from 'src/layouts/UserLayout'
+import { fetchUserData } from 'src/store/userDataSlice' // import the action if not already imported
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props
@@ -136,9 +137,28 @@ export default function SelectProgram() {
   const { items: models, loading: modelsLoading } = useSelector(
     (state) => state.models
   )
+  const { data: userData, loading: userLoading, error: userError } = useSelector(
+    (state) => state.user
+  )
 
   const [tabValue, setTabValue] = useState(0)
+  useEffect(() => {
+    if (!userData) {
+      dispatch(fetchUserData())
+    }
+  }, [dispatch, userData])
 
+  // Check if the package id from URL is allowed based on userData.package_data
+  useEffect(() => {
+    if (id && userData && userData.package_data) {
+      // Convert package_data values to numbers for comparison
+      const allowedPackageIds = userData.package_data.map((p) => Number(p))
+      if (!allowedPackageIds.includes(Number(id))) {
+        // Redirect to a default page or show an error message if not authorized
+        router.replace('/buildinginstruction') // Change the URL as appropriate
+      }
+    }
+  }, [id, userData, router])
   useEffect(() => {
     if (id) {
       dispatch(fetchChildPages(id))
