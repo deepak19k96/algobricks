@@ -10,9 +10,9 @@ export const fetchUserData = createAsyncThunk(
       const storedUser = localStorage.getItem('user')
         ? JSON.parse(localStorage.getItem('user'))
         : null
-      const username = storedUser?.user_nicename
+      const email = storedUser?.user_email
 
-      if (!username) {
+      if (!email) {
         return rejectWithValue('No username found in localStorage')
       }
 
@@ -20,7 +20,7 @@ export const fetchUserData = createAsyncThunk(
       const response = await axiosInstance.post(
         'wp-json/wl/v1/get_user_data',
         {
-          username,
+          email,
           AUTH_KEY: config.AUTH_KEY,
         }
       )
