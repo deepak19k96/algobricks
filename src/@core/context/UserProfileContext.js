@@ -13,20 +13,7 @@ export const UserProfileProvider = ({ children }) => {
   const router = useRouter()
   const userProfile = useSelector(state => state.auth.user)
 
-  useEffect(() => {
-    const excludedRoutes = ['/pages/register', '/pages/login', '/secure-wallet']
-    if (excludedRoutes.includes(router.pathname)) {
-      return
-    }
-
-    if (
-      localStorage?.getItem('accessToken') !== '' &&
-      (userProfile?.email === null || userProfile?.email === undefined)
-    ) {
-    } else {
-      router.push('/pages/login')
-    }
-  }, [userProfile, dispatch])
+  
 
   return <UserProfileContext.Provider value={userProfile}>{children}</UserProfileContext.Provider>
 }

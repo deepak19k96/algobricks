@@ -7,6 +7,7 @@ import modelsReducer from './modelsSlice' // New slice
 import uiReducer from './uiSlice' // <-- Import your ui slice reducer
 import modelReducer from './modelSlice'   // New slice for model data
 import userDataReducer from './userDataSlice'
+import forgotPasswordReducer from './forgotPasswordSlice' // <-- Import forgot password reducer
 
 
 export const store = configureStore({
@@ -20,6 +21,8 @@ export const store = configureStore({
     snackbar: snackbarReducer,
 
     ui: uiReducer, // <-- Add it here
+    forgotPassword: forgotPasswordReducer, // <-- Added here
+
 
   },
 })

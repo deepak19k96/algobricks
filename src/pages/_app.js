@@ -46,18 +46,14 @@ const App = props => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   const router = useRouter()
   useEffect(() => {
-    if (!Component) {
-      console.error('Component is undefined or null in _app.js.')
-    }
-
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken')
-      const publicRoutes = ['/pages/login']
+      const publicRoutes = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse']
       if (!token && !publicRoutes.includes(router.pathname)) {
         router.push('/pages/login')
       }
     }
-  }, [router.pathname, router, Component])
+  }, [router.pathname, router])
 
   if (!Component) {
     return null

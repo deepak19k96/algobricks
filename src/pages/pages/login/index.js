@@ -262,7 +262,7 @@ const LoginPage = () => {
                 }}
               >
                 <Box sx={{ mb: { xs: 1, sm: 0 } }}>
-                  <Link passHref href='/'>
+                  <Link passHref href='/pages/forgotpassword'>
                     <Typography
                       sx={{
                         cursor: 'pointer',
@@ -277,7 +277,7 @@ const LoginPage = () => {
                   </Link>
                 </Box>
                 <Box>
-                  <FormControlLabel
+                <FormControlLabel
                     control={
                       <Checkbox
                         size='small'
@@ -300,13 +300,27 @@ const LoginPage = () => {
                         }}
                       >
                         By logging in I approve the{' '}
-                        <span style={{ color: '#054A91' }}>Term of use</span>
+                        <Link passHref href='/pages/termsofuse'>
+                          <Typography
+                            component='span'
+                            sx={{
+                              color: '#054A91',
+                              fontSize: '0.7rem',
+                              textDecoration: 'none',
+                              cursor: 'pointer',
+                              fontWeight: 1000
+                            }}
+                          >
+                            Terms of use
+                          </Typography>
+                        </Link>
                       </Typography>
                     }
                     sx={{ mr: 0 }}
                   />
                 </Box>
               </Box>
+
 
               {/* Login Button */}
               <Button
@@ -333,8 +347,8 @@ const LoginPage = () => {
                   Want to join Young Engineers?
                 </Typography>
                 <Typography variant='body2'>
-                  <Link passHref href='/'>
-                    <Typography
+                <Link passHref href='https://youngengineers.org/'>
+                <Typography
                       component='span'
                       variant='body2'
                       sx={{
@@ -348,8 +362,8 @@ const LoginPage = () => {
                     </Typography>
                   </Link>
                   |
-                  <Link passHref href='/'>
-                    <Typography
+                  <Link passHref href='https://youngengineers.org/'>
+                  <Typography
                       component='span'
                       variant='body2'
                       sx={{
