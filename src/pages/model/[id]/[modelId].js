@@ -169,11 +169,11 @@ const SelectProgramModel = () => {
     )
   }
 
-  if (!modelData) {
-    router.replace(`/model/${id}`)
+  // if (!modelData) {
+  //   router.replace(`/model/${id}`)
     
-    return null
-  }
+  //   return null
+  // }
 
   if (!backgroundImageUrl) {
     let lessonProgramRelation = ''
