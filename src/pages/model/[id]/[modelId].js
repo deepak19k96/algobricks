@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Box, Typography, GlobalStyles } from '@mui/material'
 import { useSelector, useDispatch } from 'react-redux'
@@ -17,10 +17,9 @@ const SelectProgramModel = () => {
   const router = useRouter()
   const { id, modelId } = router.query
   const dispatch = useDispatch()
-
-  // ------------------
-  // Redux State Selectors
-  // ------------------
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const galleryRef = useRef(null)
+ 
   const {
     data: userData,
     loading: userLoading,
@@ -208,6 +207,17 @@ const SelectProgramModel = () => {
     dispatch(setBackgroundImageUrl(newBackgroundImageUrl))
   }
 
+  const handleSlide = (index) => {
+    setCurrentIndex(index)
+  }
+
+  const computedSwipeThreshold =
+    galleryImages &&
+    galleryImages.length > 0 &&
+    (currentIndex === 0 || currentIndex === galleryImages.length - 1)
+      ? 100000
+      : 100
+
   // ------------------
   // If we reach here, we can safely render the model
   // ------------------
@@ -260,6 +270,9 @@ const SelectProgramModel = () => {
               showFullscreenButton={true}
               thumbnailPosition="bottom"
               additionalClass="my-gallery"
+              infinite={false}
+              
+
             />
           ) : (
             <Typography variant="h6" sx={{ color: '#000' }}>
