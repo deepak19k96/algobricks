@@ -51,11 +51,23 @@ const BuildingInstruction = () => {
 
       {/* Scrollable content layer */}
       <Box sx={{ position: 'relative', marginTop: { xs: '0px', sm: '80px' }, py: 4 }}>
-        {loading && (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-            <img src="/images/loader.gif" alt="Loading..." style={{ width: 100, height: 100 }} />
-          </Box>
-        )}
+      {loading && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999, // ensure it appears above other content
+          }}
+        >
+          <img src="/images/loader.gif" alt="Loading..." style={{ width: 100, height: 100 }} />
+        </Box>
+      )}
 
         <Box sx={{ width: '100%', maxWidth: 900, mx: 'auto', px: { xs: 2, md: 0 }, position: 'relative', zIndex: 5 }}>
           {error && !loading && <div>Error: {error}</div>}

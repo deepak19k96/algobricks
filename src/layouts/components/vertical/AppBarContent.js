@@ -2,12 +2,27 @@
 import { Box, IconButton, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
+import { fetchUserData } from 'src/store/userDataSlice'
 
 const AppBarContent = ({ pageTitle, showIcons }) => {
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const dispatch = useDispatch()
+
+  // Retrieve user data from Redux store
+  const userData = useSelector(state => state.user.data)
+  // Check if user_status is blocked
+  const isBlocked = userData?.user_status === 'Blocked'
+  // Dispatch fetchUserData if not already available
+  useEffect(() => {
+    if (!userData) {
+      dispatch(fetchUserData())
+    }
+  }, [dispatch, userData])
 
   // Safely get the user name (this code runs only on the client)
   const userName =
@@ -50,6 +65,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
               py: 0
             }}
           >
+            {!isBlocked && (
             <Box
               sx={{
                 backgroundColor: '#91B508',
@@ -71,15 +87,20 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
                 Hi {userName}
               </Typography>
             </Box>
+            )}
             {/* User dropdown on the right */}
+
+            {!isBlocked && (
             <Box sx={{ pr: 2 }}>
               <UserDropdown />
             </Box>
+            )}
           </Box>
         ) : (
           // --- DESKTOP LAYOUT (unchanged) ---
           <>
             {/* Left: Greeting Bubble */}
+            {!isBlocked && (
             <Box
               sx={{
                 backgroundColor: '#91B508',
@@ -96,6 +117,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
             >
               Hi {userName}
             </Box>
+            )}
             {/* Center: Icons and Page Title */}
             <Box sx={{ textAlign: 'center' }}>
               {showIcons && (
@@ -156,9 +178,12 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
               </Typography>
             </Box>
             {/* Right: User Dropdown */}
-            <Box sx={{ mr: 15 }}>
-              <UserDropdown />
-            </Box>
+            {!isBlocked && (
+              <Box sx={{ mr: 15 }}>
+                <UserDropdown />
+              </Box>
+            )}
+
           </>
         )}
       </Box>

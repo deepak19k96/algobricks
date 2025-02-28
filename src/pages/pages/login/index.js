@@ -25,6 +25,7 @@ import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { login } from 'src/store/authSlice'
+import { fetchUserData } from 'src/store/userDataSlice'
 
 const StyledFormControlLabel = styled(FormControlLabel)(() => ({
   '& .MuiFormControlLabel-label': {
@@ -75,17 +76,24 @@ const LoginPage = () => {
   const onSubmit = async data => {
     if (!termsChecked) {
       setTermsError(true)
-      
+
       return
-
+      
     }
-
+  
     try {
       const response = await dispatch(login(data)).unwrap()
       if (response?.token) {
         localStorage.setItem('accessToken', response.token)
         localStorage.setItem('user', JSON.stringify(response))
-        router.push('/buildinginstruction')
+        const userDataResponse = await dispatch(fetchUserData()).unwrap()
+        if (userDataResponse?.user_status === 'Blocked') {
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('user')
+          router.push('/blockeduser')
+        } else {
+          router.push('/buildinginstruction')
+        }
       }
     } catch (error) {
       console.error('Login error:', error)

@@ -48,7 +48,7 @@ const App = props => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken')
-      const publicRoutes = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse']
+      const publicRoutes = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse', '/blockeduser']
       if (!token && !publicRoutes.includes(router.pathname)) {
         router.push('/pages/login')
       }
