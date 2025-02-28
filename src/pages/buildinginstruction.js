@@ -1,39 +1,32 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Box, Typography, Grid, Card, CardContent } from '@mui/material'
 import { useRouter } from 'next/router'
 import { fetchInstructions } from 'src/store/instructionsSlice'
-import { fetchUserData } from 'src/store/userDataSlice'
 import UserLayout from 'src/layouts/UserLayout'
 
 const BuildingInstruction = () => {
   const dispatch = useDispatch()
   const router = useRouter()
-  const { items: instructions, loading: instructionsLoading, error: instructionsError } = useSelector((state) => state.instructions)
-  const { data: userData, loading: userLoading, error: userError } = useSelector((state) => state.user)
+  const { items: instructions, loading, error } = useSelector((state) => state.instructions)
+  const [userEmail, setUserEmail] = useState(null)
 
-  // Dispatch the user data fetch on mount
+  // Retrieve the user email from localStorage on component mount
   useEffect(() => {
-    dispatch(fetchUserData())
-  }, [dispatch])
-
-  // When user data is available, fetch instructions
-  useEffect(() => {
-    if (userData) {
-      dispatch(fetchInstructions())
+    const storedUser = localStorage.getItem('user')
+      ? JSON.parse(localStorage.getItem('user'))
+      : null
+    if (storedUser && storedUser.user_email) {
+      setUserEmail(storedUser.user_email)
     }
-  }, [dispatch, userData])
+  }, [])
 
-  // Convert package_data to numbers for filtering
-  const userPackageData = userData?.package_data ? userData.package_data.map(Number) : []
-
-  // Filter instructions based on user package data
-  const filteredInstructions = instructions.filter((item) =>
-    userPackageData.includes(item.id)
-  )
-
-  const combinedLoading = instructionsLoading || userLoading
-  const combinedError = userError || instructionsError
+  // Once the email is available, fetch the packages using that email
+  useEffect(() => {
+    if (userEmail) {
+      dispatch(fetchInstructions(userEmail))
+    }
+  }, [dispatch, userEmail])
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -58,19 +51,17 @@ const BuildingInstruction = () => {
 
       {/* Scrollable content layer */}
       <Box sx={{ position: 'relative', marginTop: { xs: '0px', sm: '80px' }, py: 4 }}>
-        {/* Loader Overlay */}
-        {combinedLoading && (
+        {loading && (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
             <img src="/images/loader.gif" alt="Loading..." style={{ width: 100, height: 100 }} />
           </Box>
         )}
 
-        {/* Content Container */}
         <Box sx={{ width: '100%', maxWidth: 900, mx: 'auto', px: { xs: 2, md: 0 }, position: 'relative', zIndex: 5 }}>
-          {combinedError && !combinedLoading && <div>Error: {combinedError}</div>}
+          {error && !loading && <div>Error: {error}</div>}
 
           <Grid container rowSpacing={15} columnSpacing={10} justifyContent="center">
-            {filteredInstructions.map((item) => (
+            {instructions.map((item) => (
               <Grid item key={item.id} sx={{ mx: { xs: 'auto', sm: 0 } }}>
                 <Card
                   onClick={() => router.push(`/model/${item.id}`)}
@@ -91,7 +82,7 @@ const BuildingInstruction = () => {
                     sx={{
                       position: 'relative',
                       height: 60,
-                      backgroundImage: `url(${item.lego_long || ''})`,
+                      backgroundImage: `url(${item.acf?.lego_long?.url || ''})`,
                       backgroundSize: 'contain',
                       backgroundRepeat: 'no-repeat',
                       backgroundPosition: 'center',
@@ -112,7 +103,7 @@ const BuildingInstruction = () => {
                         textShadow: '0 0 5px rgba(0, 0, 0, 0.8)',
                         whiteSpace: 'nowrap',
                       }}
-                      dangerouslySetInnerHTML={{ __html: item.title.rendered }}
+                      dangerouslySetInnerHTML={{ __html: item.acf?.packages_name || item.name }}
                     />
                   </Box>
 
@@ -128,8 +119,8 @@ const BuildingInstruction = () => {
                     }}
                   >
                     <img
-                      src={item.package_logo ? item.package_logo[0] : 'https://via.placeholder.com/150'}
-                      alt={item.title.rendered}
+                      src={item.acf?.package_logo?.url || 'https://via.placeholder.com/150'}
+                      alt={item.acf?.packages_name || item.name}
                       style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     />
                   </CardContent>
@@ -143,8 +134,8 @@ const BuildingInstruction = () => {
   )
 }
 
-BuildingInstruction.getLayout = (page) => {
-  return <UserLayout pageTitle="Select Package">{page}</UserLayout>
-}
+BuildingInstruction.getLayout = (page) => (
+  <UserLayout pageTitle="Select Package">{page}</UserLayout>
+)
 
 export default BuildingInstruction

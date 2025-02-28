@@ -1,18 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
 import axiosInstance from 'src/api/axiosInstance'
 
 export const fetchInstructions = createAsyncThunk(
   'instructions/fetchInstructions',
-  async (_, { rejectWithValue }) => {
+  async (useremail, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(
-        'wp-json/wp/v2/pages?parent=42&per_page=100'
-      )
+      const response = await axiosInstance.get('wp-json/wp/v2/package', {
+        params: { useremail },
+      })
       return response.data
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to fetch instructions'
+      const errorMessage = error.response?.data?.message || 'Failed to fetch instructions'
       return rejectWithValue(errorMessage)
     }
   }
@@ -26,9 +24,9 @@ const instructionsSlice = createSlice({
     error: null,
   },
   reducers: {},
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(fetchInstructions.pending, state => {
+      .addCase(fetchInstructions.pending, (state) => {
         state.loading = true
         state.error = null
       })

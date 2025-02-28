@@ -6,7 +6,7 @@ export const fetchChildPages = createAsyncThunk(
   'models/fetchChildPages',
   async (parentId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`wp-json/wp/v2/pages?parent=${parentId}&per_page=100`)
+      const response = await axiosInstance.get(`wp-json/wp/v2/pages?package=${parentId}`)
       return response.data
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch child pages'

@@ -13,11 +13,10 @@ import {
 import { useTheme, styled } from '@mui/material/styles'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchInstructions } from 'src/store/instructionsSlice'
 import { fetchChildPages } from 'src/store/modelsSlice'
 import { setBackgroundImageUrl } from 'src/store/uiSlice'
 import UserLayout from 'src/layouts/UserLayout'
-import { fetchUserData } from 'src/store/userDataSlice' // import the action if not already imported
+import { fetchUserData } from 'src/store/userDataSlice'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props
@@ -67,13 +66,15 @@ const LegoHeader = styled(Box)(({ theme, background }) => ({
   justifyContent: 'center',
 }))
 
-const ModelImageContainer = styled(Box)(() => ({
+const ModelImageContainer = styled(Box)({
   width: '100%',
-  backgroundColor: '#fff',
+  height: 130, // or whatever fixed height you want
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-}))
+  backgroundColor: '#fff'
+})
+
 
 const CodeFooter = styled(Box)(({ theme }) => ({
   height: 65,
@@ -92,7 +93,7 @@ function SkeletonCard() {
     <ModelCard sx={{ overflow: 'hidden' }}>
       <Box
         sx={{
-          height: 70, // same on all devices
+          height: 70,
           backgroundImage: 'url("/images/headerskelton.png")',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
@@ -129,16 +130,12 @@ export default function SelectProgram() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  // Redux state selectors
-  const { items: instructions, loading: instructionsLoading } = useSelector(
-    (state) => state.instructions
-  )
-
+  // Redux state selectors (removed instructions from redux)
   const { items: models, loading: modelsLoading } = useSelector(
     (state) => state.models
   )
   
-  const { data: userData, loading: userLoading, error: userError } = useSelector(
+  const { data: userData } = useSelector(
     (state) => state.user
   )
 
@@ -149,14 +146,12 @@ export default function SelectProgram() {
     }
   }, [dispatch, userData])
 
-  // Check if the package id from URL is allowed based on userData.package_data
+  // Check package id authorization
   useEffect(() => {
     if (id && userData && userData.package_data) {
-      // Convert package_data values to numbers for comparison
       const allowedPackageIds = userData.package_data.map((p) => Number(p))
       if (!allowedPackageIds.includes(Number(id))) {
-        // Redirect to a default page or show an error message if not authorized
-        router.replace('/buildinginstruction') // Change the URL as appropriate
+        router.replace('/buildinginstruction')
       }
     }
   }, [id, userData, router])
@@ -165,12 +160,6 @@ export default function SelectProgram() {
       dispatch(fetchChildPages(id))
     }
   }, [id, dispatch])
-
-  useEffect(() => {
-    if (!instructions || instructions.length === 0) {
-      dispatch(fetchInstructions())
-    }
-  }, [dispatch, instructions])
 
   // Separate main and experimental models
   const mainModels = models.filter((item) => !item?.acf?.experimental_model)
@@ -182,42 +171,20 @@ export default function SelectProgram() {
     setTabValue(newValue)
   }
 
-  // Compute background image and program logo from instructions
+  // Use the first object from the fetchChildPages data to extract background details and logo
   const firstChild = mainModels[0] || experimentalModels[0] || {}
-  let lessonProgramRelation = ''
-  if (firstChild.link) {
-    const parts = firstChild.link.split('/')
-    const idx = parts.indexOf('packages-parent')
-    if (idx !== -1 && parts.length > idx + 1) {
-      lessonProgramRelation = parts[idx + 1]
-    }
-  }
 
-  let backgroundImageUrl = ''
-  let programLogoUrl = ''
+  let backgroundImageUrl = isMobile
+    ? Array.isArray(firstChild.package_mobile_background)
+      ? firstChild.package_mobile_background[0]
+      : firstChild.package_mobile_background
+    : Array.isArray(firstChild.package_desktop_background)
+    ? firstChild.package_desktop_background[0]
+    : firstChild.package_desktop_background
 
-  if (lessonProgramRelation && instructions && instructions.length > 0) {
-    const matchingInstruction = instructions.find(
-      (inst) =>
-        inst.slug.toLowerCase().trim() === lessonProgramRelation.toLowerCase().trim()
-    )
-
-    if (matchingInstruction) {
-      backgroundImageUrl = isMobile
-        ? Array.isArray(matchingInstruction.package_mobile_background)
-          ? matchingInstruction.package_mobile_background[0]
-          : matchingInstruction.package_mobile_background
-        : Array.isArray(matchingInstruction.package_desktop_background)
-        ? matchingInstruction.package_desktop_background[0]
-        : matchingInstruction.package_desktop_background
-    }
-
-    if (matchingInstruction?.package_logo) {
-      programLogoUrl = Array.isArray(matchingInstruction.package_logo)
-        ? matchingInstruction.package_logo[0]
-        : matchingInstruction.package_logo
-    }
-  }
+  let programLogoUrl = Array.isArray(firstChild.package_logo)
+    ? firstChild.package_logo[0]
+    : firstChild.package_logo
 
   if (!backgroundImageUrl) {
     backgroundImageUrl = '/images/whitebg.jpeg'
@@ -249,7 +216,7 @@ export default function SelectProgram() {
   }
 
   const renderModelCard = (model) => {
-    const { id: modelId, title, legoHeader, image, lessonPassword } = extractModelData(model)
+    const { id: modelId, title, legoHeader, image } = extractModelData(model)
 
     const handleClick = () => {
       dispatch(setBackgroundImageUrl(backgroundImageUrl))
@@ -278,19 +245,19 @@ export default function SelectProgram() {
             />
           </LegoHeader>
           <ModelImageContainer>
-            <Box
-              component="img"
-              src={image}
-              alt={title}
-              sx={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-              }}
-            />
+          <Box
+  component="img"
+  src={image}
+  alt={title}
+  sx={{
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover'
+  }}
+/>
           </ModelImageContainer>
           <CodeFooter>
             <Stack direction="column" alignItems="center" spacing={-1}>
-             
               <PlayArrowIcon sx={{ color: '#fff', fontSize: 40 }} />
             </Stack>
           </CodeFooter>
@@ -310,7 +277,7 @@ export default function SelectProgram() {
           height: '100vh',
           backgroundColor: '#fff',
           backgroundImage:
-            modelsLoading || instructionsLoading ? 'none' : `url(${backgroundImageUrl})`,
+            modelsLoading ? 'none' : `url(${backgroundImageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: -1,
@@ -326,19 +293,21 @@ export default function SelectProgram() {
         }}
       >
         {/* Program Logo */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-          {programLogoUrl && (
-            <Box
-              component="img"
-              src={programLogoUrl}
-              alt="Program Logo"
-              sx={{ maxWidth: '200px', height: 'auto' }}
-            />
-          )}
-        </Box>
+      {/* Only show the logo when models are done loading */}
+{!modelsLoading && programLogoUrl && (
+  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+    <Box
+      component="img"
+      src={programLogoUrl}
+      alt="Program Logo"
+      sx={{ maxWidth: '200px', height: 'auto' }}
+    />
+  </Box>
+)}
+
 
         {/* Loading state: Show Skeleton Cards */}
-        {(modelsLoading || instructionsLoading) && (
+        {modelsLoading && (
           <Grid
             container
             columns={{ xs: 1, sm: 5 }}
@@ -365,7 +334,7 @@ export default function SelectProgram() {
         )}
 
         {/* Actual Content */}
-        {!(modelsLoading || instructionsLoading) && (
+        {!modelsLoading && (
           <>
             {hasMain && hasExperimental ? (
               <>
