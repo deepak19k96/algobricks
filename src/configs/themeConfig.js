@@ -1,6 +1,6 @@
 const themeConfig = {
   // ** Layout Configs
-  templateName: 'youngengineers' /* App Name */,
+  templateName: 'Young Engineers' /* App Name */,
   mode: 'light' /* light | dark */,
   contentWidth: 'boxed' /* full | boxed */,
   // ** Routing Configs

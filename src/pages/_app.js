@@ -64,7 +64,7 @@ const App = props => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
-        <title>{`${themeConfig.templateName} - Portal`}</title>
+        <title>{`${themeConfig.templateName}`}</title>
         <meta
           name='description'
           content={`${themeConfig.templateName} – Portal for google wallet and bot.`}

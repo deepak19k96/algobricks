@@ -8,8 +8,14 @@ class CustomDocument extends Document {
     return (
       <Html lang='en'>
         <Head>
+          {/* Set Page Title */}
+
+          {/* Set Favicon (Logo) */}
+          <link rel="icon" href="/images/indexlogo.png" />
+
+          {/* Preconnect to Google Fonts */}
           <link rel='preconnect' href='https://fonts.googleapis.com' />
-          <link rel='preconnect' href='https://fonts.gstatic.com' />
+          <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin="anonymous" />
           <link
             rel='stylesheet'
             href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
@@ -24,7 +30,7 @@ class CustomDocument extends Document {
   }
 }
 
-// Make sure there's a blank line above getInitialProps
+// Handle Emotion Styles for SSR
 CustomDocument.getInitialProps = async ctx => {
   const originalRenderPage = ctx.renderPage
 
@@ -37,8 +43,6 @@ CustomDocument.getInitialProps = async ctx => {
     })
 
   const initialProps = await Document.getInitialProps(ctx)
-
-  // Separate the declarations with blank lines as needed
   const emotionStyles = extractCriticalToChunks(initialProps.html)
 
   const emotionStyleTags = emotionStyles.styles.map(style => (
@@ -49,7 +53,6 @@ CustomDocument.getInitialProps = async ctx => {
     />
   ))
 
-  // ESLint often wants a blank line right before return:
   return {
     ...initialProps,
     styles: [...Children.toArray(initialProps.styles), ...emotionStyleTags]
