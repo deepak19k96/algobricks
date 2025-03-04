@@ -206,26 +206,35 @@ const SelectProgramModel = () => {
 
       {/* Custom Thumbnail Styling */}
       <GlobalStyles
-        styles={{
-          '.my-gallery .image-gallery-thumbnail': {
-            border: '1px solid black',
-            marginRight: '1px',
-            padding: '2px',
-            cursor: 'pointer'
-          },
-          '.my-gallery .image-gallery-thumbnail:last-child': {
-            marginRight: '0'
-          },
-          '.my-gallery .image-gallery-thumbnails': {
-            display: 'flex',
-            gap: '10px'
-          },
-          '.my-gallery .image-gallery-thumbnail.active, .my-gallery .image-gallery-thumbnail:hover':
-            {
-              border: '4px solid rgb(59, 122, 224)'
-            }
-        }}
-      />
+  styles={{
+    '.my-gallery .image-gallery-thumbnail': {
+      border: '1px solid black',
+      marginRight: '1px',
+      padding: '2px',
+      cursor: 'pointer'
+    },
+    '.my-gallery .image-gallery-thumbnail:last-child': {
+      marginRight: '0'
+    },
+    '.my-gallery .image-gallery-thumbnails': {
+      display: 'flex',
+      gap: '10px'
+    },
+    '.my-gallery .image-gallery-thumbnail.active, .my-gallery .image-gallery-thumbnail:hover': {
+      border: '4px solid rgb(59, 122, 224)'
+    },
+    '.image-gallery-content.fullscreen': {
+      backgroundColor: '#fff !important' // White background in fullscreen mode
+    },
+    '.image-gallery-slide': {
+      backgroundColor: '#fff !important' // Ensures individual slides have a white background
+    },
+    '.image-gallery-image': {
+      backgroundColor: '#fff !important', // Ensures images don't show black transparency
+      padding: '10px' // Adds a little padding so images are not touching edges
+    }
+  }}
+/>
     </Box>
   )
 }
