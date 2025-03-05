@@ -24,11 +24,13 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
     }
   }, [dispatch, userData])
 
-  // Safely get the user name (this code runs only on the client)
-  const userName =
-    typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('user'))?.user_display_name
-      : ''
+  const localUser =
+  typeof window !== 'undefined'
+    ? JSON.parse(localStorage.getItem('user'))
+    : null
+const isUserPresent = !!localUser
+const userName = localUser?.user_display_name || ''
+
 
   return (
     <>
@@ -65,7 +67,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
               py: 0
             }}
           >
-            {!isBlocked && (
+            {isUserPresent && !isBlocked && (
             <Box
               sx={{
                 backgroundColor: '#91B508',
@@ -90,7 +92,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
             )}
             {/* User dropdown on the right */}
 
-            {!isBlocked && (
+            {isUserPresent && !isBlocked && (
             <Box sx={{ pr: 2 }}>
               <UserDropdown />
             </Box>
@@ -100,7 +102,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
           // --- DESKTOP LAYOUT (unchanged) ---
           <>
             {/* Left: Greeting Bubble */}
-            {!isBlocked && (
+            {isUserPresent && !isBlocked && (
             <Box
               sx={{
                 backgroundColor: '#91B508',
@@ -178,7 +180,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
               </Typography>
             </Box>
             {/* Right: User Dropdown */}
-            {!isBlocked && (
+            {isUserPresent && !isBlocked && (
               <Box sx={{ mr: 15 }}>
                 <UserDropdown />
               </Box>

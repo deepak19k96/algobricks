@@ -1,39 +1,22 @@
 // pages/_app.js
 import Head from 'next/head'
-import { useRouter } from 'next/router' // Import useRouter
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-
-// ** Redux Imports
-import { Provider } from 'react-redux'
+import { Provider, useDispatch } from 'react-redux'
 import { store } from '../store'
-
-// ** Loader Import (NProgress)
 import NProgress from 'nprogress'
-
-// ** Emotion Imports
 import { CacheProvider } from '@emotion/react'
-
-// ** Config Imports
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Component Imports
 import UserLayout from 'src/layouts/UserLayout'
 import ThemeComponent from 'src/@core/theme/ThemeComponent'
 import Snackbar from 'src/@core/components/snackbar'
-import GlobalLoader from 'src/@core/components/GlobalLoader/GlobalLoader' // Global loader import
-
-// ** Contexts
+import GlobalLoader from 'src/@core/components/GlobalLoader/GlobalLoader'
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
 import { UserProfileProvider } from 'src/@core/context/UserProfileContext'
-
-// ** Utils Imports
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
-
-// ** React Perfect Scrollbar Style
 import 'react-perfect-scrollbar/dist/css/styles.css'
-
-// ** Global css styles
 import '../../styles/globals.css'
+import { fetchUserData } from 'src/store/userDataSlice'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -42,9 +25,36 @@ if (themeConfig.routingLoader) {
   NProgress.configure({ showSpinner: false })
 }
 
+// Global component to fetch user details and check user status
+const FetchUserDetail = () => {
+  const dispatch = useDispatch()
+  const router = useRouter()
+
+  useEffect(() => {
+    // Only fetch if a token exists (i.e. user is logged in)
+    if (typeof window !== 'undefined' && localStorage.getItem('accessToken')) {
+      dispatch(fetchUserData())
+        .unwrap()
+        .then(data => {
+          if (data.user_status === 'Blocked') {
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('user')
+            router.push('/blockeduser')
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error)
+        })
+    }
+  }, [dispatch, router])
+
+  return null
+}
+
 const App = props => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   const router = useRouter()
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken')
@@ -76,13 +86,14 @@ const App = props => {
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
       <Provider store={store}>
+        {/* Fetch global user details and check if blocked */}
+        <FetchUserDetail />
         <Snackbar />
         <SettingsProvider>
           <UserProfileProvider>
             <SettingsConsumer>
               {({ settings }) => (
                 <ThemeComponent settings={settings}>
-                  {/* <GlobalLoader /> */}
                   {getLayout(<Component {...pageProps} />)}
                 </ThemeComponent>
               )}
