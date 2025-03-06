@@ -2,7 +2,7 @@
 import { Box, IconButton, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import { fetchUserData } from 'src/store/userDataSlice'
@@ -12,11 +12,22 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const dispatch = useDispatch()
+  const [localUser, setLocalUser] = useState(null)
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      setLocalUser(JSON.parse(storedUser))
+    }
+  }, [])
 
+  // Determine if user exists
+  const isUserPresent = !!localUser
+  const userName = localUser?.user_display_name || ''
   // Retrieve user data from Redux store
   const userData = useSelector(state => state.user.data)
   // Check if user_status is blocked
   const isBlocked = userData?.user_status === 'Blocked'
+
   // Dispatch fetchUserData if not already available
   useEffect(() => {
     if (!userData) {
@@ -24,12 +35,12 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
     }
   }, [dispatch, userData])
 
-  const localUser =
-  typeof window !== 'undefined'
-    ? JSON.parse(localStorage.getItem('user'))
-    : null
-const isUserPresent = !!localUser
-const userName = localUser?.user_display_name || ''
+//   const localUser =
+//   typeof window !== 'undefined'
+//     ? JSON.parse(localStorage.getItem('user'))
+//     : null
+// const isUserPresent = !!localUser
+// const userName = localUser?.user_display_name || ''
 
 
   return (
