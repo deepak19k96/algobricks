@@ -32,7 +32,7 @@ const FetchUserDetail = () => {
 
   useEffect(() => {
     // Only fetch if a token exists (i.e. user is logged in)
-    if (typeof window !== 'undefined' && localStorage.getItem('accessToken')) {
+    if (typeof window !== 'undefined' && localStorage.getItem('accessToken') && localStorage.getItem('user')) {
       dispatch(fetchUserData())
         .unwrap()
         .then(data => {
@@ -43,6 +43,7 @@ const FetchUserDetail = () => {
           }
         })
         .catch(error => {
+          router.push('/pages/login')
           console.error('Error fetching user data:', error)
         })
     }
@@ -58,8 +59,10 @@ const App = props => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken')
+      const user = localStorage.getItem('user')
+      const parsedUser = typeof user === 'string' ? JSON.parse(user) : user
       const publicRoutes = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse', '/blockeduser']
-      if (!token && !publicRoutes.includes(router.pathname)) {
+      if ((!token || !parsedUser?.Email) && !publicRoutes.includes(router.pathname)) {
         router.push('/pages/login')
       }
     }

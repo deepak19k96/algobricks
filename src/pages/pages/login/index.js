@@ -52,7 +52,7 @@ const LoginPage = () => {
   } = useForm()
 
   useEffect(() => {
-    if (localStorage?.getItem('accessToken') !== '' && user?.email !== null && user?.email !== undefined) {
+    if (localStorage?.getItem('accessToken') !== '' && user?.Email !== null && user?.Email !== undefined) {
       router.push('/')
     }
   }, [user, router])
@@ -72,6 +72,7 @@ const LoginPage = () => {
   const onSubmit = async data => {
     if (!termsChecked) {
       setTermsError(true)
+
       return
     }
 
@@ -95,12 +96,12 @@ const LoginPage = () => {
 
     try {
       const response = await dispatch(getAlgobrixBackersByEmail(data)).unwrap()
-      console.log(response, 'response')
       if (response.token) {
         const algobrixBackersUser = response.user
         const token = response.token
         localStorage.setItem('accessToken', token)
         localStorage.setItem('user', JSON.stringify(algobrixBackersUser))
+
         // const userDataResponse = await dispatch(fetchUserData()).unwrap()
         if (algobrixBackersUser?.Status === 'Blocked') {
           localStorage.removeItem('accessToken')

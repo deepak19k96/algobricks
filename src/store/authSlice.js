@@ -150,7 +150,7 @@ const authSlice = createSlice({
         state.error = null
       })
       .addCase(getAlgobrixBackersByEmail.fulfilled, (state, action) => {
-        state.algobrixBackers = action.payload.user ? action.payload.user : null
+        state.user = action.payload.user ? action.payload.user : null
         state.token = action.payload.token
         state.isAuthenticated = true
         state.isLoading = false

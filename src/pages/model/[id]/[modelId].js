@@ -14,6 +14,7 @@ import { setBackgroundImageUrl } from 'src/store/uiSlice'
 const SelectProgramModel = () => {
   const router = useRouter()
   const { id, modelId } = router.query
+
   const dispatch = useDispatch()
   const [currentIndex, setCurrentIndex] = useState(0)
   const galleryRef = useRef(null)
@@ -36,6 +37,9 @@ const SelectProgramModel = () => {
       dispatch(fetchChildPages(id))
     }
   }, [id, dispatch])
+
+  // prevent build-time or SSR errors
+  if (!id || !modelId) return null
 
   // Show loader until user and childPages data is ready
   const allLoading = userLoading || childPagesLoading

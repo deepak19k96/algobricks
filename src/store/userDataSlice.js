@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosInstance from 'src/api/axiosInstance'
 import config from 'src/config/config'
-
+import { setSnackbarMessage } from './snackbarSlice' // Import the action from snackbarSlice
 /*
 export const fetchUserData = createAsyncThunk(
   'user/fetchUserData',
@@ -36,7 +36,7 @@ export const fetchUserData = createAsyncThunk(
 )
  */
 
-export const fetchUserData = createAsyncThunk('user/fetchUserData', async (_, { rejectWithValue }) => {
+export const fetchUserData = createAsyncThunk('user/fetchUserData', async (_, { rejectWithValue, dispatch }) => {
   try {
     // Retrieve username from localStorage
     const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
@@ -55,6 +55,7 @@ export const fetchUserData = createAsyncThunk('user/fetchUserData', async (_, { 
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch user data'
+    dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
     return rejectWithValue(errorMessage)
   }
 })
@@ -64,7 +65,8 @@ const userDataSlice = createSlice({
   initialState: {
     data: null,
     loading: false,
-    error: null
+    error: null,
+    isRedirect: false
   },
   reducers: {},
   extraReducers: builder => {
@@ -72,6 +74,7 @@ const userDataSlice = createSlice({
       .addCase(fetchUserData.pending, state => {
         state.loading = true
         state.error = null
+        state.isRedirect = false
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.loading = false
@@ -80,6 +83,7 @@ const userDataSlice = createSlice({
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
+        state.isRedirect = true
       })
   }
 })

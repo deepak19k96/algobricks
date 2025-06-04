@@ -25,6 +25,8 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
   const userName = localUser?.Name || ''
   // Retrieve user data from Redux store
   const userData = useSelector(state => state.user.data)
+ // const isRedirect = useSelector(state => state.user.isRedirect)
+  //const userData = useSelector(state => state.user.data)
   // Check if user_status is blocked
   const isBlocked = userData?.Status === 'Blocked'
 
@@ -34,6 +36,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
       dispatch(fetchUserData())
     }
   }, [dispatch, userData])
+
 
   //   const localUser =
   //   typeof window !== 'undefined'
