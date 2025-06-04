@@ -18,16 +18,10 @@ const SelectProgramModel = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const galleryRef = useRef(null)
 
-  const { data: userData, loading: userLoading, error: userError } = useSelector(
-    (state) => state.user
-  )
+  const { data: userData, loading: userLoading, error: userError } = useSelector(state => state.user)
 
-  const {
-    items: childPages,
-    loading: childPagesLoading,
-    error: childPagesError
-  } = useSelector((state) => state.models)
-  const backgroundImageUrl = useSelector((state) => state.ui.backgroundImageUrl)
+  const { items: childPages, loading: childPagesLoading, error: childPagesError } = useSelector(state => state.models)
+  const backgroundImageUrl = useSelector(state => state.ui.backgroundImageUrl)
 
   // 1. Fetch user data if not loaded
   useEffect(() => {
@@ -55,11 +49,7 @@ const SelectProgramModel = () => {
           minHeight: '100vh'
         }}
       >
-        <img
-          src="/images/loader.gif"
-          alt="Loading..."
-          style={{ width: 100, height: 100 }}
-        />
+        <img src='/images/loader.gif' alt='Loading...' style={{ width: 100, height: 100 }} />
       </Box>
     )
   }
@@ -74,7 +64,7 @@ const SelectProgramModel = () => {
           minHeight: '100vh'
         }}
       >
-        <Typography variant="h6" sx={{ color: 'red' }}>
+        <Typography variant='h6' sx={{ color: 'red' }}>
           {userError || childPagesError}
         </Typography>
       </Box>
@@ -82,23 +72,19 @@ const SelectProgramModel = () => {
   }
 
   // Check if the current package is allowed for the user
-  if (userData && userData.package_data) {
-    const allowedPackages = userData.package_data.map((p) => Number(p))
+  /*  if (userData && userData.package_data) {
+    const allowedPackages = userData.package_data.map(p => Number(p))
     if (!allowedPackages.includes(Number(id))) {
       router.replace('/buildinginstruction')
 
       return null
-
     }
   } else {
     return null
-  }
+  } */
 
   // Find the current model from childPages using modelId from URL
-  const currentModel = childPages.find(
-    (child) => Number(child.id) === Number(modelId)
-  )
-
+  const currentModel = childPages.find(child => Number(child.id) === Number(modelId))
   if (!currentModel) {
     router.replace(`/model/${id}`)
 
@@ -109,15 +95,14 @@ const SelectProgramModel = () => {
   // (Assuming model_0_gallery is already an array of image URLs)
   const galleryImages =
     currentModel.model_0_gallery && Array.isArray(currentModel.model_0_gallery)
-      ? currentModel.model_0_gallery.map((url) => ({
+      ? currentModel.model_0_gallery.map(url => ({
           original: url,
           thumbnail: url
         }))
       : []
 
   if (!backgroundImageUrl) {
-    
-    const isMobile = false 
+    const isMobile = false
 
     let newBackgroundImageUrl = isMobile
       ? Array.isArray(currentModel.package_mobile_background)
@@ -128,20 +113,17 @@ const SelectProgramModel = () => {
       : currentModel.package_desktop_background
 
     if (!newBackgroundImageUrl) {
-      newBackgroundImageUrl =
-        'https://via.placeholder.com/1920x1080?text=No+Background+Image'
+      newBackgroundImageUrl = 'https://via.placeholder.com/1920x1080?text=No+Background+Image'
     }
     dispatch(setBackgroundImageUrl(newBackgroundImageUrl))
   }
 
-  const handleSlide = (index) => {
+  const handleSlide = index => {
     setCurrentIndex(index)
   }
 
   const computedSwipeThreshold =
-    galleryImages &&
-    galleryImages.length > 0 &&
-    (currentIndex === 0 || currentIndex === galleryImages.length - 1)
+    galleryImages && galleryImages.length > 0 && (currentIndex === 0 || currentIndex === galleryImages.length - 1)
       ? 100000
       : 100
 
@@ -192,12 +174,12 @@ const SelectProgramModel = () => {
               items={galleryImages}
               showPlayButton={false}
               showFullscreenButton={true}
-              thumbnailPosition="bottom"
-              additionalClass="my-gallery"
+              thumbnailPosition='bottom'
+              additionalClass='my-gallery'
               infinite={false}
             />
           ) : (
-            <Typography variant="h6" sx={{ color: '#000' }}>
+            <Typography variant='h6' sx={{ color: '#000' }}>
               No images found.
             </Typography>
           )}
@@ -206,41 +188,39 @@ const SelectProgramModel = () => {
 
       {/* Custom Thumbnail Styling */}
       <GlobalStyles
-  styles={{
-    '.my-gallery .image-gallery-thumbnail': {
-      border: '1px solid black',
-      marginRight: '1px',
-      padding: '2px',
-      cursor: 'pointer'
-    },
-    '.my-gallery .image-gallery-thumbnail:last-child': {
-      marginRight: '0'
-    },
-    '.my-gallery .image-gallery-thumbnails': {
-      display: 'flex',
-      gap: '10px'
-    },
-    '.my-gallery .image-gallery-thumbnail.active, .my-gallery .image-gallery-thumbnail:hover': {
-      border: '4px solid rgb(59, 122, 224)'
-    },
-    '.image-gallery-content.fullscreen': {
-      backgroundColor: '#fff !important' // White background in fullscreen mode
-    },
-    '.image-gallery-slide': {
-      backgroundColor: '#fff !important' // Ensures individual slides have a white background
-    },
-    '.image-gallery-image': {
-      backgroundColor: '#fff !important', // Ensures images don't show black transparency
-      padding: '10px' // Adds a little padding so images are not touching edges
-    }
-  }}
-/>
+        styles={{
+          '.my-gallery .image-gallery-thumbnail': {
+            border: '1px solid black',
+            marginRight: '1px',
+            padding: '2px',
+            cursor: 'pointer'
+          },
+          '.my-gallery .image-gallery-thumbnail:last-child': {
+            marginRight: '0'
+          },
+          '.my-gallery .image-gallery-thumbnails': {
+            display: 'flex',
+            gap: '10px'
+          },
+          '.my-gallery .image-gallery-thumbnail.active, .my-gallery .image-gallery-thumbnail:hover': {
+            border: '4px solid rgb(59, 122, 224)'
+          },
+          '.image-gallery-content.fullscreen': {
+            backgroundColor: '#fff !important' // White background in fullscreen mode
+          },
+          '.image-gallery-slide': {
+            backgroundColor: '#fff !important' // Ensures individual slides have a white background
+          },
+          '.image-gallery-image': {
+            backgroundColor: '#fff !important', // Ensures images don't show black transparency
+            padding: '10px' // Adds a little padding so images are not touching edges
+          }
+        }}
+      />
     </Box>
   )
 }
 
-SelectProgramModel.getLayout = (page) => (
-  <DynamicUserLayout>{page}</DynamicUserLayout>
-)
+SelectProgramModel.getLayout = page => <DynamicUserLayout>{page}</DynamicUserLayout>
 
 export default SelectProgramModel
