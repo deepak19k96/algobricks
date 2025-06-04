@@ -36,7 +36,7 @@ const FetchUserDetail = () => {
       dispatch(fetchUserData())
         .unwrap()
         .then(data => {
-          if (data.user_status === 'Blocked') {
+          if (data.user.Status === 'Blocked') {
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
             router.push('/blockeduser')
@@ -75,14 +75,8 @@ const App = props => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>{`${themeConfig.templateName}`}</title>
-        <meta
-          name='description'
-          content={`${themeConfig.templateName} – Portal for google wallet and bot.`}
-        />
-        <meta
-          name='keywords'
-          content='Material Design, MUI, Admin Template, React Admin Template'
-        />
+        <meta name='description' content={`${themeConfig.templateName} – Portal for google wallet and bot.`} />
+        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
       <Provider store={store}>
@@ -93,9 +87,7 @@ const App = props => {
           <UserProfileProvider>
             <SettingsConsumer>
               {({ settings }) => (
-                <ThemeComponent settings={settings}>
-                  {getLayout(<Component {...pageProps} />)}
-                </ThemeComponent>
+                <ThemeComponent settings={settings}>{getLayout(<Component {...pageProps} />)}</ThemeComponent>
               )}
             </SettingsConsumer>
           </UserProfileProvider>

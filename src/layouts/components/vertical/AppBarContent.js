@@ -22,11 +22,11 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
 
   // Determine if user exists
   const isUserPresent = !!localUser
-  const userName = localUser?.user_display_name || ''
+  const userName = localUser?.Name || ''
   // Retrieve user data from Redux store
   const userData = useSelector(state => state.user.data)
   // Check if user_status is blocked
-  const isBlocked = userData?.user_status === 'Blocked'
+  const isBlocked = userData?.Status === 'Blocked'
 
   // Dispatch fetchUserData if not already available
   useEffect(() => {
@@ -35,13 +35,12 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
     }
   }, [dispatch, userData])
 
-//   const localUser =
-//   typeof window !== 'undefined'
-//     ? JSON.parse(localStorage.getItem('user'))
-//     : null
-// const isUserPresent = !!localUser
-// const userName = localUser?.user_display_name || ''
-
+  //   const localUser =
+  //   typeof window !== 'undefined'
+  //     ? JSON.parse(localStorage.getItem('user'))
+  //     : null
+  // const isUserPresent = !!localUser
+  // const userName = localUser?.user_display_name || ''
 
   return (
     <>
@@ -55,8 +54,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
           // Make height smaller since icons/title have moved out
           height: isMobile ? '100px' : '120px',
           zIndex: 1100,
-          backgroundImage: isMobile? 'url("/images/navbarmobile-2.jpeg")':
-            'url("/images/navbardesktop.jpeg")',
+          backgroundImage: isMobile ? 'url("/images/navbarmobile-2.jpeg")' : 'url("/images/navbardesktop.jpeg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           display: 'flex',
@@ -79,34 +77,34 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
             }}
           >
             {isUserPresent && !isBlocked && (
-            <Box
-              sx={{
-                backgroundColor: '#91B508',
-                py: 5,
-                borderRadius: '0 40px 40px 0',
-                px: 5,
-                             display: 'flex',
-                alignItems: 'center',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <Typography
+              <Box
                 sx={{
-                  color: '#fff',
-                  fontWeight: 500,
-                  fontSize: '1.1rem'
+                  backgroundColor: '#91B508',
+                  py: 5,
+                  borderRadius: '0 40px 40px 0',
+                  px: 5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                Hi {userName}
-              </Typography>
-            </Box>
+                <Typography
+                  sx={{
+                    color: '#fff',
+                    fontWeight: 500,
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  Hi {userName}
+                </Typography>
+              </Box>
             )}
             {/* User dropdown on the right */}
 
             {isUserPresent && !isBlocked && (
-            <Box sx={{ pr: 2 }}>
-              <UserDropdown />
-            </Box>
+              <Box sx={{ pr: 2 }}>
+                <UserDropdown />
+              </Box>
             )}
           </Box>
         ) : (
@@ -114,58 +112,55 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
           <>
             {/* Left: Greeting Bubble */}
             {isUserPresent && !isBlocked && (
-            <Box
-              sx={{
-                backgroundColor: '#91B508',
-                color: '#fff',
-                fontWeight: 500,
-                fontSize: '1.3rem',
-                borderRadius: '0 40px 40px 0',
-                px: 3,
-                minHeight: '70px',
-                display: 'flex',
-                alignItems: 'center',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Hi {userName}
-            </Box>
+              <Box
+                sx={{
+                  backgroundColor: '#91B508',
+                  color: '#fff',
+                  fontWeight: 500,
+                  fontSize: '1.3rem',
+                  borderRadius: '0 40px 40px 0',
+                  px: 3,
+                  minHeight: '70px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Hi {userName}
+              </Box>
             )}
             {/* Center: Icons and Page Title */}
             <Box sx={{ textAlign: 'center' }}>
               {showIcons && (
                 <Box sx={{ mb: 1 }}>
-                  <IconButton
-                    onClick={() => router.push('/buildinginstruction')}
-                    sx={{ color: '#fff', mr: 2 }}
-                  >
+                  <IconButton onClick={() => router.push('/buildinginstruction')} sx={{ color: '#fff', mr: 2 }}>
                     <svg
-                      stroke="currentColor"
-                      fill="none"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      height="2rem"
-                      width="2em"
-                      xmlns="http://www.w3.org/2000/svg"
+                      stroke='currentColor'
+                      fill='none'
+                      strokeWidth='2'
+                      viewBox='0 0 24 24'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      height='2rem'
+                      width='2em'
+                      xmlns='http://www.w3.org/2000/svg'
                     >
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                      <polyline points="9 22 9 12 15 12 15 22" />
+                      <path d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' />
+                      <polyline points='9 22 9 12 15 12 15 22' />
                     </svg>
                   </IconButton>
                   <IconButton onClick={() => router.back()} sx={{ color: '#fff' }}>
                     <svg
-                      stroke="currentColor"
-                      fill="currentColor"
-                      strokeWidth="0"
-                      viewBox="0 0 512 512"
-                      height="2rem"
-                      width="2em"
-                      xmlns="http://www.w3.org/2000/svg"
+                      stroke='currentColor'
+                      fill='currentColor'
+                      strokeWidth='0'
+                      viewBox='0 0 512 512'
+                      height='2rem'
+                      width='2em'
+                      xmlns='http://www.w3.org/2000/svg'
                     >
                       <path
-                        d="M8 256c0 137 111 248 248 248s248-111 
+                        d='M8 256c0 137 111 248 248 248s248-111 
                           248-248S393 8 256 8 8 119 8 256zm448 
                           0c0 110.5-89.5 200-200 200S56 366.5 
                           56 256 145.5 56 256 56s200 89.5 200 
@@ -173,7 +168,7 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
                           12H256v67c0 10.7-12.9 16-20.5 
                           8.5l-99-99c-4.7-4.7-4.7-12.3 
                           0-17l99-99c7.6-7.6 20.5-2.2 
-                          20.5 8.5v67h116c6.6 0 12 5.4 12 12z"
+                          20.5 8.5v67h116c6.6 0 12 5.4 12 12z'
                       />
                     </svg>
                   </IconButton>
@@ -196,7 +191,6 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
                 <UserDropdown />
               </Box>
             )}
-
           </>
         )}
       </Box>
@@ -205,57 +199,57 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
         BELOW the fixed bar, render icons + title ONLY on mobile. 
         This Box is not fixed, so it appears “under” the main bar.
       */}
-   {isMobile && (
-  <>
-    {/* Fixed icons/title bar under main navbar */}
-    <Box
-      sx={{
-        position: 'fixed',
-        top: '100px',       // the mobile navbar is 100px tall
-        left: 0,
-        width: '100%',
-        zIndex: 1050,       // below the navbar’s 1100 but above content
-        backgroundColor: '#fff',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // optional shadow
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        p: 1
-      }}
-    >
-      {/* Icons row */}
-      {showIcons && (
-        <Box sx={{ mb: 1, display: 'flex', justifyContent: 'center' }}>
-          {/* Home Icon */}
-          <IconButton onClick={() => router.push('/')} sx={{ color: '#054A91', mr: 2 }}>
-          <svg
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            height="1.5rem"
-            width="1.5em"
-            xmlns="http://www.w3.org/2000/svg"
+      {isMobile && (
+        <>
+          {/* Fixed icons/title bar under main navbar */}
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '100px', // the mobile navbar is 100px tall
+              left: 0,
+              width: '100%',
+              zIndex: 1050, // below the navbar’s 1100 but above content
+              backgroundColor: '#fff',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // optional shadow
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              p: 1
+            }}
           >
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-          </IconButton>
-          {/* Back Icon */}
-          <IconButton onClick={() => router.back()} sx={{ color: '#054A91' }}>
-          <svg
-            stroke="currentColor"
-            fill="currentColor"
-            strokeWidth="0"
-            viewBox="0 0 512 512"
-            height="1.5rem"
-            width="1.5em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 256c0 137 111 248 248 248s248-111 
+            {/* Icons row */}
+            {showIcons && (
+              <Box sx={{ mb: 1, display: 'flex', justifyContent: 'center' }}>
+                {/* Home Icon */}
+                <IconButton onClick={() => router.push('/')} sx={{ color: '#054A91', mr: 2 }}>
+                  <svg
+                    stroke='currentColor'
+                    fill='none'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    height='1.5rem'
+                    width='1.5em'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' />
+                    <polyline points='9 22 9 12 15 12 15 22' />
+                  </svg>
+                </IconButton>
+                {/* Back Icon */}
+                <IconButton onClick={() => router.back()} sx={{ color: '#054A91' }}>
+                  <svg
+                    stroke='currentColor'
+                    fill='currentColor'
+                    strokeWidth='0'
+                    viewBox='0 0 512 512'
+                    height='1.5rem'
+                    width='1.5em'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M8 256c0 137 111 248 248 248s248-111 
                  248-248S393 8 256 8 8 119 8 256zm448 
                  0c0 110.5-89.5 200-200 200S56 366.5 
                  56 256 145.5 56 256 56s200 89.5 200 
@@ -263,31 +257,30 @@ const AppBarContent = ({ pageTitle, showIcons }) => {
                  12H256v67c0 10.7-12.9 16-20.5 
                  8.5l-99-99c-4.7-4.7-4.7-12.3 
                  0-17l99-99c7.6-7.6 20.5-2.2 
-                 20.5 8.5v67h116c6.6 0 12 5.4 12 12z"
-            />
-          </svg>
-          </IconButton>
-        </Box>
+                 20.5 8.5v67h116c6.6 0 12 5.4 12 12z'
+                    />
+                  </svg>
+                </IconButton>
+              </Box>
+            )}
+
+            {/* Page Title */}
+            <Typography
+              sx={{
+                color: '#054A91',
+                fontWeight: 550,
+                fontSize: '20px',
+                fontFamily: 'sans-serif'
+              }}
+            >
+              {pageTitle}
+            </Typography>
+          </Box>
+
+          {/* Push main content below these fixed bars */}
+          <Box sx={{ mt: '160px' }} />
+        </>
       )}
-
-      {/* Page Title */}
-      <Typography
-        sx={{
-          color: '#054A91',
-          fontWeight: 550,
-          fontSize: '20px',
-          fontFamily: 'sans-serif'
-        }}
-      >
-        {pageTitle}
-      </Typography>
-    </Box>
-
-    {/* Push main content below these fixed bars */}
-    <Box sx={{ mt: '160px' }} />
-  </>
-)}
-
     </>
   )
 }

@@ -17,12 +17,7 @@ const Dashboard = () => {
     }
   }, [router])
 
-  return (
-    <ApexChartWrapper>
-
-    
-    </ApexChartWrapper>
-  )
+  return <ApexChartWrapper></ApexChartWrapper>
 }
 
 export default Dashboard
