@@ -13,7 +13,5 @@ export const UserProfileProvider = ({ children }) => {
   const router = useRouter()
   const userProfile = useSelector(state => state.auth.user)
 
-  
-
   return <UserProfileContext.Provider value={userProfile}>{children}</UserProfileContext.Provider>
 }

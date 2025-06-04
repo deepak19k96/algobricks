@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosInstance from 'src/api/axiosInstance'
 import { setSnackbarMessage } from './snackbarSlice' // Import the action from snackbarSlice
 
-
 // export const getUserProfileAsync = createAsyncThunk(
 //   'users/getUserProfile',
 //   async (_, { rejectWithValue, dispatch }) => {
@@ -27,11 +26,26 @@ import { setSnackbarMessage } from './snackbarSlice' // Import the action from s
 //   return response
 // })
 
-export const login = createAsyncThunk(
-  'auth/login',
+export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue, dispatch }) => {
+  try {
+    const response = await axiosInstance.post('wp-json/jwt-auth/v1/token', credentials)
+    return response.data
+  } catch (error) {
+    // Get error message from response and strip HTML tags
+    let errorMessage = error.response?.data?.message || 'An error occurred'
+    errorMessage = errorMessage.replace(/<[^>]+>/g, '') // Remove HTML tags
+
+    // Dispatch snackbar error with 'error' severity
+    dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const getAlgobrixBackersByEmail = createAsyncThunk(
+  'auth/getAlgobrixBackersByEmail',
   async (credentials, { rejectWithValue, dispatch }) => {
     try {
-      const response = await axiosInstance.post('wp-json/jwt-auth/v1/token', credentials)
+      const response = await axiosInstance.post('wp-json/zoho/v1/get-algobrix-backers', credentials)
       return response.data
     } catch (error) {
       // Get error message from response and strip HTML tags
@@ -130,22 +144,23 @@ const authSlice = createSlice({
         state.isLoading = false
         state.error = action.error.message
       })
-      // .addCase(registerUser.pending, state => {
-      //   state.isLoading = true
-      //   state.error = null
-      // })
-      // .addCase(registerUser.fulfilled, (state, action) => {
-      //   state.token = action.payload.token
-      //   state.user = action.payload.user
-      //   state.isAuthenticated = true
-      //   state.isLoading = false
-      //   state.error = null
-      //   localStorage.setItem('accessToken', action.payload.token)
-      // })
-      // .addCase(registerUser.rejected, (state, action) => {
-      //   state.isLoading = false
-      //   state.error = action.error.message
-      // })
+
+      .addCase(getAlgobrixBackersByEmail.pending, state => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(getAlgobrixBackersByEmail.fulfilled, (state, action) => {
+        state.user = action.payload.user ? action.payload.user : null
+        state.token = action.payload.token
+        state.isAuthenticated = true
+        state.isLoading = false
+        state.error = null
+        localStorage.setItem('accessToken', action.payload.token)
+      })
+      .addCase(getAlgobrixBackersByEmail.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.error.message
+      })
   }
 })
 

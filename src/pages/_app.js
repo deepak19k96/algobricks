@@ -32,17 +32,18 @@ const FetchUserDetail = () => {
 
   useEffect(() => {
     // Only fetch if a token exists (i.e. user is logged in)
-    if (typeof window !== 'undefined' && localStorage.getItem('accessToken')) {
+    if (typeof window !== 'undefined' && localStorage.getItem('accessToken') && localStorage.getItem('user')) {
       dispatch(fetchUserData())
         .unwrap()
         .then(data => {
-          if (data.user_status === 'Blocked') {
+          if (data.user.Status === 'Blocked') {
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
             router.push('/blockeduser')
           }
         })
         .catch(error => {
+          router.push('/pages/login')
           console.error('Error fetching user data:', error)
         })
     }
@@ -58,8 +59,10 @@ const App = props => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken')
+      const user = localStorage.getItem('user')
+      const parsedUser = typeof user === 'string' ? JSON.parse(user) : user
       const publicRoutes = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse', '/blockeduser']
-      if (!token && !publicRoutes.includes(router.pathname)) {
+      if ((!token || !parsedUser?.Email) && !publicRoutes.includes(router.pathname)) {
         router.push('/pages/login')
       }
     }
@@ -75,14 +78,8 @@ const App = props => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>{`${themeConfig.templateName}`}</title>
-        <meta
-          name='description'
-          content={`${themeConfig.templateName} – Portal for google wallet and bot.`}
-        />
-        <meta
-          name='keywords'
-          content='Material Design, MUI, Admin Template, React Admin Template'
-        />
+        <meta name='description' content={`${themeConfig.templateName} – Portal for google wallet and bot.`} />
+        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
       <Provider store={store}>
@@ -93,9 +90,7 @@ const App = props => {
           <UserProfileProvider>
             <SettingsConsumer>
               {({ settings }) => (
-                <ThemeComponent settings={settings}>
-                  {getLayout(<Component {...pageProps} />)}
-                </ThemeComponent>
+                <ThemeComponent settings={settings}>{getLayout(<Component {...pageProps} />)}</ThemeComponent>
               )}
             </SettingsConsumer>
           </UserProfileProvider>

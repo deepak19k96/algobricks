@@ -1,15 +1,7 @@
 // src/pages/selectprogram/[id]/index.jsx
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import {
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-  Grid,
-  Stack,
-  useMediaQuery
-} from '@mui/material'
+import { Box, Typography, Tabs, Tab, Grid, Stack, useMediaQuery } from '@mui/material'
 import { useTheme, styled } from '@mui/material/styles'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,7 +15,7 @@ function TabPanel(props) {
 
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -38,7 +30,7 @@ const ModelCard = styled(Box)(({ theme }) => ({
   width: 185,
   [theme.breakpoints.down('sm')]: {
     width: '60%',
-    margin: 'auto',
+    margin: 'auto'
   },
   borderRadius: 8,
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
@@ -47,14 +39,14 @@ const ModelCard = styled(Box)(({ theme }) => ({
   transition: 'transform 0.3s ease',
   cursor: 'pointer',
   '&:hover': {
-    transform: 'translateY(-5px)',
-  },
+    transform: 'translateY(-5px)'
+  }
 }))
 
 const LegoHeader = styled(Box)(({ theme, background }) => ({
   height: 70,
   [theme.breakpoints.down('sm')]: {
-    height: 50,
+    height: 50
   },
   width: '100%',
   backgroundImage: background ? `url(${background})` : 'none',
@@ -63,7 +55,7 @@ const LegoHeader = styled(Box)(({ theme, background }) => ({
   backgroundPosition: 'center',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'center'
 }))
 
 const ModelImageContainer = styled(Box)({
@@ -75,17 +67,16 @@ const ModelImageContainer = styled(Box)({
   backgroundColor: '#fff'
 })
 
-
 const CodeFooter = styled(Box)(({ theme }) => ({
   height: 65,
   [theme.breakpoints.down('sm')]: {
-    height: 80,
+    height: 80
   },
   width: '100%',
   backgroundColor: '#91B508',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'center'
 }))
 
 function SkeletonCard() {
@@ -97,7 +88,7 @@ function SkeletonCard() {
           backgroundImage: 'url("/images/headerskelton.png")',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center'
         }}
       />
       <Box
@@ -106,7 +97,7 @@ function SkeletonCard() {
           backgroundImage: 'url("/images/skeltonbody.png")',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center'
         }}
       />
       <Box
@@ -115,7 +106,7 @@ function SkeletonCard() {
           backgroundImage: 'url("/images/skeltonfooter.png")',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center'
         }}
       />
     </ModelCard>
@@ -131,13 +122,9 @@ export default function SelectProgram() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   // Redux state selectors (removed instructions from redux)
-  const { items: models, loading: modelsLoading } = useSelector(
-    (state) => state.models
-  )
-  
-  const { data: userData } = useSelector(
-    (state) => state.user
-  )
+  const { items: models, loading: modelsLoading } = useSelector(state => state.models)
+
+  const { data: userData } = useSelector(state => state.user)
 
   const [tabValue, setTabValue] = useState(0)
   useEffect(() => {
@@ -149,7 +136,7 @@ export default function SelectProgram() {
   // Check package id authorization
   useEffect(() => {
     if (id && userData && userData.package_data) {
-      const allowedPackageIds = userData.package_data.map((p) => Number(p))
+      const allowedPackageIds = userData.package_data.map(p => Number(p))
       if (!allowedPackageIds.includes(Number(id))) {
         router.replace('/buildinginstruction')
       }
@@ -162,8 +149,8 @@ export default function SelectProgram() {
   }, [id, dispatch])
 
   // Separate main and experimental models
-  const mainModels = models.filter((item) => !item?.acf?.experimental_model)
-  const experimentalModels = models.filter((item) => item?.acf?.experimental_model)
+  const mainModels = models.filter(item => !item?.acf?.experimental_model)
+  const experimentalModels = models.filter(item => item?.acf?.experimental_model)
 
   const skeletonArray = Array.from({ length: 10 }, (_, i) => i)
 
@@ -182,9 +169,7 @@ export default function SelectProgram() {
     ? firstChild.package_desktop_background[0]
     : firstChild.package_desktop_background
 
-  let programLogoUrl = Array.isArray(firstChild.package_logo)
-    ? firstChild.package_logo[0]
-    : firstChild.package_logo
+  let programLogoUrl = Array.isArray(firstChild.package_logo) ? firstChild.package_logo[0] : firstChild.package_logo
 
   if (!backgroundImageUrl) {
     backgroundImageUrl = '/images/whitebg.jpeg'
@@ -211,11 +196,11 @@ export default function SelectProgram() {
       title: modelTitle,
       legoHeader,
       image,
-      lessonPassword,
+      lessonPassword
     }
   }
 
-  const renderModelCard = (model) => {
+  const renderModelCard = model => {
     const { id: modelId, title, legoHeader, image } = extractModelData(model)
 
     const handleClick = () => {
@@ -224,40 +209,35 @@ export default function SelectProgram() {
     }
 
     return (
-      <Grid
-        item
-        xs={1}
-        key={modelId}
-        sx={{ display: 'flex', justifyContent: 'center' }}
-      >
+      <Grid item xs={1} key={modelId} sx={{ display: 'flex', justifyContent: 'center' }}>
         <ModelCard onClick={handleClick}>
           <LegoHeader background={legoHeader}>
             <Typography
-              variant="subtitle1"
+              variant='subtitle1'
               sx={{
                 color: '#fff',
                 fontWeight: 500,
                 fontSize: 15,
                 textShadow: '0 0 5px rgba(0, 0, 0, 0.8)',
-                textAlign: 'center',
+                textAlign: 'center'
               }}
               dangerouslySetInnerHTML={{ __html: title }}
             />
           </LegoHeader>
           <ModelImageContainer>
-          <Box
-  component="img"
-  src={image}
-  alt={title}
-  sx={{
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  }}
-/>
+            <Box
+              component='img'
+              src={image}
+              alt={title}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
           </ModelImageContainer>
           <CodeFooter>
-            <Stack direction="column" alignItems="center" spacing={-1}>
+            <Stack direction='column' alignItems='center' spacing={-1}>
               <PlayArrowIcon sx={{ color: '#fff', fontSize: 40 }} />
             </Stack>
           </CodeFooter>
@@ -276,11 +256,10 @@ export default function SelectProgram() {
           width: '100vw',
           height: '100vh',
           backgroundColor: '#fff',
-          backgroundImage:
-            modelsLoading ? 'none' : `url(${backgroundImageUrl})`,
+          backgroundImage: modelsLoading ? 'none' : `url(${backgroundImageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          zIndex: -1,
+          zIndex: -1
         }}
       />
 
@@ -289,22 +268,16 @@ export default function SelectProgram() {
         sx={{
           position: 'relative',
           marginTop: isMobile ? '0px' : '55px',
-          py: 4,
+          py: 4
         }}
       >
         {/* Program Logo */}
-      {/* Only show the logo when models are done loading */}
-{!modelsLoading && programLogoUrl && (
-  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-    <Box
-      component="img"
-      src={programLogoUrl}
-      alt="Program Logo"
-      sx={{ maxWidth: '200px', height: 'auto' }}
-    />
-  </Box>
-)}
-
+        {/* Only show the logo when models are done loading */}
+        {!modelsLoading && programLogoUrl && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+            <Box component='img' src={programLogoUrl} alt='Program Logo' sx={{ maxWidth: '200px', height: 'auto' }} />
+          </Box>
+        )}
 
         {/* Loading state: Show Skeleton Cards */}
         {modelsLoading && (
@@ -317,16 +290,11 @@ export default function SelectProgram() {
               width: '100%',
               maxWidth: { xs: '100%', sm: 1200 },
               margin: '0 auto',
-              mt: 2,
+              mt: 2
             }}
           >
-            {skeletonArray.map((item) => (
-              <Grid
-                item
-                xs={1}
-                key={item}
-                sx={{ display: 'flex', justifyContent: 'center' }}
-              >
+            {skeletonArray.map(item => (
+              <Grid item xs={1} key={item} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <SkeletonCard />
               </Grid>
             ))}
@@ -357,16 +325,16 @@ export default function SelectProgram() {
                         '&.Mui-selected': {
                           color: '#fff',
                           backgroundColor: '#91B508',
-                          borderRadius: '5px 5px 0 0',
-                        },
+                          borderRadius: '5px 5px 0 0'
+                        }
                       },
                       '& .MuiTabs-indicator': {
-                        display: 'none',
-                      },
+                        display: 'none'
+                      }
                     }}
                   >
-                    <Tab label="Main Models" />
-                    <Tab label="Experimental Models" />
+                    <Tab label='Main Models' />
+                    <Tab label='Experimental Models' />
                   </Tabs>
                   <Box
                     sx={{
@@ -375,7 +343,7 @@ export default function SelectProgram() {
                       width: '100%',
                       maxWidth: { xs: '100%', sm: 1200 },
                       margin: '0 auto',
-                      mt: '-4px',
+                      mt: '-4px'
                     }}
                   />
                 </Box>
@@ -389,7 +357,7 @@ export default function SelectProgram() {
                     sx={{
                       width: '100%',
                       maxWidth: { xs: '100%', sm: 1200 },
-                      margin: '0 auto',
+                      margin: '0 auto'
                     }}
                   >
                     {mainModels.map(renderModelCard)}
@@ -405,7 +373,7 @@ export default function SelectProgram() {
                     sx={{
                       width: '100%',
                       maxWidth: { xs: '100%', sm: 1200 },
-                      margin: '0 auto',
+                      margin: '0 auto'
                     }}
                   >
                     {experimentalModels.map(renderModelCard)}
@@ -422,7 +390,7 @@ export default function SelectProgram() {
                   width: '100%',
                   maxWidth: { xs: '100%', sm: 1200 },
                   margin: '0 auto',
-                  mt: 2,
+                  mt: 2
                 }}
               >
                 {mainModels.map(renderModelCard)}
@@ -437,18 +405,18 @@ export default function SelectProgram() {
                   width: '100%',
                   maxWidth: { xs: '100%', sm: 1200 },
                   margin: '0 auto',
-                  mt: 2,
+                  mt: 2
                 }}
               >
                 {experimentalModels.map(renderModelCard)}
               </Grid>
             ) : (
               <Typography
-                variant="h6"
+                variant='h6'
                 sx={{
                   color: 'black',
                   textAlign: 'center',
-                  mt: 4,
+                  mt: 4
                 }}
               >
                 Record not found!
@@ -461,9 +429,9 @@ export default function SelectProgram() {
   )
 }
 
-SelectProgram.getLayout = (page) => {
+SelectProgram.getLayout = page => {
   return (
-    <UserLayout pageTitle="Select Model" showIcons>
+    <UserLayout pageTitle='Select Model' showIcons>
       {page}
     </UserLayout>
   )

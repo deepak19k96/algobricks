@@ -24,7 +24,7 @@ import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 
 import BlankLayout from 'src/@core/layouts/BlankLayout'
-import { login } from 'src/store/authSlice'
+import { getAlgobrixBackersByEmail } from 'src/store/authSlice'
 import { fetchUserData } from 'src/store/userDataSlice'
 
 const StyledFormControlLabel = styled(FormControlLabel)(() => ({
@@ -52,11 +52,7 @@ const LoginPage = () => {
   } = useForm()
 
   useEffect(() => {
-    if (
-      localStorage?.getItem('accessToken') !== '' &&
-      user?.email !== null &&
-      user?.email !== undefined
-    ) {
+    if (localStorage?.getItem('accessToken') !== '' && user?.Email !== null && user?.Email !== undefined) {
       router.push('/')
     }
   }, [user, router])
@@ -78,16 +74,36 @@ const LoginPage = () => {
       setTermsError(true)
 
       return
-      
     }
-  
-    try {
-      const response = await dispatch(login(data)).unwrap()
+
+    /* try {
+     const response = await dispatch(login(data)).unwrap()
       if (response?.token) {
         localStorage.setItem('accessToken', response.token)
         localStorage.setItem('user', JSON.stringify(response))
         const userDataResponse = await dispatch(fetchUserData()).unwrap()
         if (userDataResponse?.user_status === 'Blocked') {
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('user')
+          router.push('/blockeduser')
+        } else {
+          router.push('/buildinginstruction')
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+    } */
+
+    try {
+      const response = await dispatch(getAlgobrixBackersByEmail(data)).unwrap()
+      if (response.token) {
+        const algobrixBackersUser = response.user
+        const token = response.token
+        localStorage.setItem('accessToken', token)
+        localStorage.setItem('user', JSON.stringify(algobrixBackersUser))
+
+        // const userDataResponse = await dispatch(fetchUserData()).unwrap()
+        if (algobrixBackersUser?.Status === 'Blocked') {
           localStorage.removeItem('accessToken')
           localStorage.removeItem('user')
           router.push('/blockeduser')
@@ -134,40 +150,39 @@ const LoginPage = () => {
         >
           <CardContent sx={{ p: { xs: 3, sm: 15 } }}>
             {/* Top Logos */}
-        {/* Top Logos */}
-<Box
-  sx={{
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    mb: { xs: 2, sm: 2 },
-    gap: { xs: 6, sm: 10 },
-    flexWrap: 'nowrap'
-  }}
->
-  <Box
-    component="img"
-    src="/images/logomain-1.png"
-    alt="Young Engineers Logo"
-    sx={{
-      width: { xs: 80, sm: 'auto' },
-      height: { xs: 40, sm: 60 },
-      objectFit: 'contain'
-    }}
-  />
-  <Box
-    component="img"
-    src="/images/logomain-2.png"
-    alt="Young Engineers Online Logo"
-    sx={{
-      width: { xs: 100, sm: 'auto' },
-      height: { xs: 60, sm: 60 },
-      objectFit: 'contain'
-    }}
-  />
-</Box>
-
+            {/* Top Logos */}
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: { xs: 2, sm: 2 },
+                gap: { xs: 6, sm: 10 },
+                flexWrap: 'nowrap'
+              }}
+            >
+              <Box
+                component='img'
+                src='/images/logomain-1.png'
+                alt='Young Engineers Logo'
+                sx={{
+                  width: { xs: 80, sm: 'auto' },
+                  height: { xs: 40, sm: 60 },
+                  objectFit: 'contain'
+                }}
+              />
+              <Box
+                component='img'
+                src='/images/logomain-2.png'
+                alt='Young Engineers Online Logo'
+                sx={{
+                  width: { xs: 100, sm: 'auto' },
+                  height: { xs: 60, sm: 60 },
+                  objectFit: 'contain'
+                }}
+              />
+            </Box>
 
             {/* Heading */}
             <Typography
@@ -184,10 +199,7 @@ const LoginPage = () => {
 
             {/* Warning for Terms not accepted */}
             {termsError && (
-              <Typography
-                variant='body2'
-                sx={{ textAlign: 'center', color: 'red', mb: 2 }}
-              >
+              <Typography variant='body2' sx={{ textAlign: 'center', color: 'red', mb: 2 }}>
                 You must agree to the terms of use
               </Typography>
             )}
@@ -197,19 +209,20 @@ const LoginPage = () => {
               {/* Username or Email */}
               <TextField
                 fullWidth
-                label='Username'
-                {...register('username', {
-                  required: true,
-                  minLength: 3
+                label='Email'
+                {...register('email', {
+                  required: 'Email is required',
+                  minLength: {
+                    value: 3,
+                    message: 'Email must be at least 3 characters'
+                  },
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Please enter a valid email address'
+                  }
                 })}
-                error={!!errors.username}
-                helperText={
-                  errors.username
-                    ? errors.username.type === 'required'
-                      ? 'Username is required'
-                      : 'Username must be at least 3 characters'
-                    : ''
-                }
+                error={!!errors.email}
+                helperText={errors.email?.message || ''}
                 sx={{
                   mb: 4,
                   '& label.Mui-focused': {
@@ -221,7 +234,7 @@ const LoginPage = () => {
                 }}
               />
 
-              {/* Password */}
+              {/* Password 
               <FormControl
                 fullWidth
                 error={!!errors.password}
@@ -259,8 +272,8 @@ const LoginPage = () => {
                   <FormHelperText>Password is required</FormHelperText>
                 )}
               </FormControl>
-
-              {/* Forgot Password and Terms Row */}
+            */}
+              {/*Forgot Password and Terms Row  */}
               <Box
                 sx={{
                   display: { xs: 'block', sm: 'flex' },
@@ -269,7 +282,7 @@ const LoginPage = () => {
                   mb: 3
                 }}
               >
-                <Box sx={{ mb: { xs: 1, sm: 0 } }}>
+                {/*   <Box sx={{ mb: { xs: 1, sm: 0 } }}>
                   <Link passHref href='/pages/forgotpassword'>
                     <Typography
                       sx={{
@@ -283,9 +296,9 @@ const LoginPage = () => {
                       Forgot password?
                     </Typography>
                   </Link>
-                </Box>
+                </Box> */}
                 <Box>
-                <FormControlLabel
+                  <FormControlLabel
                     control={
                       <Checkbox
                         size='small'
@@ -329,7 +342,6 @@ const LoginPage = () => {
                 </Box>
               </Box>
 
-
               {/* Login Button */}
               <Button
                 fullWidth
@@ -355,8 +367,8 @@ const LoginPage = () => {
                   Want to join Young Engineers?
                 </Typography>
                 <Typography variant='body2'>
-                <Link passHref href='https://youngengineers.org/'>
-                <Typography
+                  <Link passHref href='https://youngengineers.org/'>
+                    <Typography
                       component='span'
                       variant='body2'
                       sx={{
@@ -371,7 +383,7 @@ const LoginPage = () => {
                   </Link>
                   |
                   <Link passHref href='https://youngengineers.org/'>
-                  <Typography
+                    <Typography
                       component='span'
                       variant='body2'
                       sx={{
@@ -406,11 +418,7 @@ const LoginPage = () => {
             zIndex: 9999
           }}
         >
-          <img
-            src='/images/loader.gif'
-            alt='Loading...'
-            style={{ width: 100, height: 100 }}
-          />
+          <img src='/images/loader.gif' alt='Loading...' style={{ width: 100, height: 100 }} />
         </Box>
       )}
     </Box>
