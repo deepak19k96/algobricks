@@ -52,7 +52,12 @@ const LoginPage = () => {
   } = useForm()
 
   useEffect(() => {
-    if (localStorage?.getItem('accessToken') !== '' && user?.Email !== null && user?.Email !== undefined) {
+    if (
+      localStorage?.getItem('accessToken') !== '' &&
+      localStorage?.getItem('accessToken') !== null &&
+      user?.Email !== null &&
+      user?.Email !== undefined
+    ) {
       router.push('/')
     }
   }, [user, router])

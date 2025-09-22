@@ -103,10 +103,7 @@ const UserDropdown = () => {
         </MenuItem>
 
         {/* Log out (as a pill‐shaped button) */}
-        <MenuItem
-          sx={{ display: 'flex', justifyContent: 'center', p: 2 }}
-          onClick={handleLogout}
-        >
+        <MenuItem sx={{ display: 'flex', justifyContent: 'center', p: 2 }} onClick={handleLogout}>
           <Box sx={logoutButtonStyle}>Log out</Box>
         </MenuItem>
 
@@ -117,9 +114,7 @@ const UserDropdown = () => {
           sx={{ p: 0, display: 'flex', justifyContent: 'center' }}
           onClick={() => handleDropdownClose('/buildinginstruction')}
         >
-          <Box sx={{ ...menuItemBoxStyle, gap: 0, justifyContent: 'center' }}>
-            Terms of use
-          </Box>
+          <Box sx={{ ...menuItemBoxStyle, gap: 0, justifyContent: 'center' }}>Terms of use</Box>
         </MenuItem>
       </Menu>
     </Fragment>
