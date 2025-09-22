@@ -25,7 +25,59 @@ import { setSnackbarMessage } from './snackbarSlice' // Import the action from s
 
 //   return response
 // })
+export const sendOtp = createAsyncThunk(
+  'auth/sendOtp',
+  async (credentials, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await axiosInstance.post('wp-json/otp/v1/send', credentials)
+      
+      // Dispatch success message
+      dispatch(setSnackbarMessage({ 
+        message: response.data.message || 'OTP sent to email', 
+        severity: 'success' 
+      }))
+      
+      return response.data
+    } catch (error) {
+      // Get error message from response and strip HTML tags
+      let errorMessage = error.response?.data?.message || 'Failed to send OTP'
+      errorMessage = errorMessage.replace(/<[^>]+>/g, '') // Remove HTML tags
 
+      // Dispatch snackbar error with 'error' severity
+      dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
+      return rejectWithValue(errorMessage)
+    }
+  }
+)
+
+// Verify OTP API
+export const verifyOtp = createAsyncThunk(
+  'auth/verifyOtp',
+  async (credentials, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await axiosInstance.post('wp-json/otp/v1/verify', credentials)
+      
+      // Dispatch success message
+      dispatch(setSnackbarMessage({ 
+        message: 'Login successful!', 
+        severity: 'success' 
+      }))
+      
+      return response.data
+    } catch (error) {
+      // Get error message from response and strip HTML tags
+      let errorMessage = error.response?.data?.message || 'Invalid OTP'
+      if (error.response?.data?.code === 'invalid_otp') {
+        errorMessage = 'OTP is invalid or expired'
+      }
+      errorMessage = errorMessage.replace(/<[^>]+>/g, '') // Remove HTML tags
+
+      // Dispatch snackbar error with 'error' severity
+      dispatch(setSnackbarMessage({ message: errorMessage, severity: 'error' }))
+      return rejectWithValue(errorMessage)
+    }
+  }
+)
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue, dispatch }) => {
   try {
     const response = await axiosInstance.post('wp-json/jwt-auth/v1/token', credentials)
@@ -82,7 +134,10 @@ const authSlice = createSlice({
     user: null,
     isAuthenticated: false,
     isLoading: false,
-    error: null
+    error: null,
+    otpSent: false,
+    sendingOtp: false,
+    verifyingOtp: false
   },
   reducers: {
     setUser: (state, action) => {
@@ -96,38 +151,19 @@ const authSlice = createSlice({
       state.isAuthenticated = false
       state.isLoading = false
       state.error = null
+      state.otpSent = false
+      state.sendingOtp = false
+      state.verifyingOtp = false
+    },
+    resetOtpState: state => {
+      state.otpSent = false
+      state.sendingOtp = false
+      state.verifyingOtp = false
+      state.error = null
     }
   },
   extraReducers: builder => {
     builder
-      // .addCase(getUserProfileAsync.pending, state => {
-      //   state.isLoading = true
-      //   state.error = null
-      // })
-      // .addCase(getUserProfileAsync.fulfilled, (state, action) => {
-      //   state.user = action.payload.user
-      //   state.isAuthenticated = true
-      //   state.isLoading = false
-      //   state.error = null
-      // })
-      // .addCase(getUserProfileAsync.rejected, (state, action) => {
-      //   state.isLoading = false
-      //   state.error = action.error.message
-      // })
-      // .addCase(updateUserProfileAsync.pending, state => {
-      //   state.isLoading = true
-      //   state.error = null
-      // })
-      // .addCase(updateUserProfileAsync.fulfilled, (state, action) => {
-      //   state.user = action.payload.user
-      //   state.isAuthenticated = true
-      //   state.isLoading = false
-      //   state.error = null
-      // })
-      // .addCase(updateUserProfileAsync.rejected, (state, action) => {
-      //   state.isLoading = false
-      //   state.error = action.error.message
-      // })
       .addCase(login.pending, state => {
         state.isLoading = true
         state.error = null
@@ -161,13 +197,46 @@ const authSlice = createSlice({
         state.isLoading = false
         state.error = action.error.message
       })
+
+      // Send OTP cases
+      .addCase(sendOtp.pending, state => {
+        state.sendingOtp = true
+        state.error = null
+      })
+      .addCase(sendOtp.fulfilled, (state, action) => {
+        state.otpSent = true
+        state.sendingOtp = false
+        state.error = null
+      })
+      .addCase(sendOtp.rejected, (state, action) => {
+        state.sendingOtp = false
+        state.error = action.payload
+      })
+
+      // Verify OTP cases
+      .addCase(verifyOtp.pending, state => {
+        state.verifyingOtp = true
+        state.error = null
+      })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        state.user = action.payload.user ? action.payload.user : null
+        state.token = action.payload.token
+        state.isAuthenticated = true
+        state.verifyingOtp = false
+        state.otpSent = false
+        state.error = null
+        localStorage.setItem('accessToken', action.payload.token)
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.verifyingOtp = false
+        state.error = action.payload
+      })
   }
 })
 
-export const { setUser, logout } = authSlice.actions
+export const { setUser, logout, resetOtpState } = authSlice.actions
 
 export const selectUser = state => state.auth.user
-
 export const selectIsAuthenticated = state => state.auth.isAuthenticated
 
 export default authSlice.reducer
