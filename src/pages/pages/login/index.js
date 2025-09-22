@@ -341,20 +341,48 @@ const handleBackToEmail = () => {
   })}
   error={!!errors.email}
   helperText={errors.email?.message || ''}
-  disabled={otpSent}  // Add this line
+  disabled={otpSent}
+  size="medium" // Add this for smaller size
   sx={{
-    mb: otpSent ? 2 : 4,  // Change this line
-    '& label.Mui-focused': {
-      color: '#054A91'
+    mb: otpSent ? 2 : 3, // Reduce margin bottom
+    '& .MuiOutlinedInput-root': {
+      height: '44px', // Even more compact height
+      borderRadius: '8px', // Match the reference image rounded corners
+      '& fieldset': {
+        borderColor: '#ddd'
+      },
+      '&:hover fieldset': {
+        borderColor: '#054A91'
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#054A91'
+      },
+      '&.Mui-disabled': {
+        backgroundColor: '#f5f5f5'
+      }
     },
-    '& .MuiOutlinedInput-root.Mui-focused fieldset': {
-      borderColor: '#054A91'
+    '& .MuiInputBase-input': {
+      padding: '10px 12px', // More compact padding
+      fontSize: '0.95rem'
     },
-    '& .MuiOutlinedInput-root.Mui-disabled': {  // Add this
-      backgroundColor: '#f5f5f5'
+    '& .MuiInputLabel-root': {
+      fontSize: '0.95rem',
+      color: '#666',
+      transform: 'translate(12px, 12px) scale(1)',
+      '&.Mui-focused': {
+        color: '#054A91'
+      },
+      '&.Mui-focused, &.MuiFormLabel-filled': {
+        transform: 'translate(12px, -8px) scale(0.75)'
+      }
+    },
+    '& .MuiFormHelperText-root': {
+      fontSize: '0.8rem',
+      marginTop: '4px'
     }
   }}
 />
+
 
 {/* 4-Box OTP Input - appears after email verification */}
 <Fade in={otpSent} timeout={500}>
