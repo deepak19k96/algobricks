@@ -17,7 +17,9 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  FormHelperText
+  FormHelperText,
+  Fade,
+  CircularProgress
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import EyeOutline from 'mdi-material-ui/EyeOutline'
@@ -26,6 +28,7 @@ import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { getAlgobrixBackersByEmail } from 'src/store/authSlice'
 import { fetchUserData } from 'src/store/userDataSlice'
+import { sendOtp, verifyOtp, resetOtpState } from 'src/store/authSlice'
 
 const StyledFormControlLabel = styled(FormControlLabel)(() => ({
   '& .MuiFormControlLabel-label': {
@@ -34,7 +37,7 @@ const StyledFormControlLabel = styled(FormControlLabel)(() => ({
 }))
 
 const LoginPage = () => {
-  const { user, isLoading } = useSelector(state => state.auth)
+  const { user, isLoading, sendingOtp, verifyingOtp, otpSent } = useSelector(state => state.auth)
   const dispatch = useDispatch()
   const router = useRouter()
 
@@ -44,10 +47,16 @@ const LoginPage = () => {
   })
   const [termsChecked, setTermsChecked] = useState(false)
   const [termsError, setTermsError] = useState(false)
+  const [otp, setOtp] = useState(['', '', '', '']) // 4 separate boxes
+  const [otpError, setOtpError] = useState('')
+  const [resendTimer, setResendTimer] = useState(0)
+
+  const [email, setEmail] = useState('')
 
   const {
     register,
     handleSubmit,
+    getValues, // Add this line
     formState: { errors }
   } = useForm()
 
@@ -75,39 +84,102 @@ const LoginPage = () => {
   }
 
   const onSubmit = async data => {
-    if (!termsChecked) {
-      setTermsError(true)
+    // First step: Send OTP
+    if (!otpSent) {
+      if (!termsChecked) {
+        setTermsError(true)
+        return
+      }
 
+      await handleSendOtp()
+    }
+    // Second step: Verify OTP
+    else {
+      await handleVerifyOtp()
+    }
+  }
+  // Resend timer countdown
+  useEffect(() => {
+    let interval = null
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(resendTimer - 1)
+      }, 1000)
+    } else if (resendTimer === 0) {
+      clearInterval(interval)
+    }
+    return () => clearInterval(interval)
+  }, [resendTimer])
+
+  // Handle Send OTP
+  const handleSendOtp = async () => {
+    const emailValue = getValues('email')
+
+    if (!emailValue || errors.email) {
       return
     }
 
-    /* try {
-     const response = await dispatch(login(data)).unwrap()
-      if (response?.token) {
-        localStorage.setItem('accessToken', response.token)
-        localStorage.setItem('user', JSON.stringify(response))
-        const userDataResponse = await dispatch(fetchUserData()).unwrap()
-        if (userDataResponse?.user_status === 'Blocked') {
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('user')
-          router.push('/blockeduser')
-        } else {
-          router.push('/buildinginstruction')
-        }
-      }
-    } catch (error) {
-      console.error('Login error:', error)
-    } */
+    if (!termsChecked) {
+      setTermsError(true)
+      return
+    }
 
     try {
-      const response = await dispatch(getAlgobrixBackersByEmail(data)).unwrap()
-      if (response.token) {
-        const algobrixBackersUser = response.user
-        const token = response.token
+      const result = await dispatch(sendOtp({ email: emailValue })).unwrap()
+      setEmail(emailValue)
+      setResendTimer(60)
+      setOtpError('')
+    } catch (error) {
+      setOtpError(error || 'Failed to send OTP. Please try again.')
+    }
+  }
+
+  // Handle OTP input change for 4-box design
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) return // Prevent multiple characters
+
+    const newOtp = [...otp]
+    newOtp[index] = value
+    setOtp(newOtp)
+
+    // Auto-focus next input
+    if (value !== '' && index < 3) {
+      document.getElementById(`otp-${index + 1}`).focus()
+    }
+
+    if (otpError) setOtpError('')
+  }
+
+  // Handle OTP key events (backspace to go back)
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && otp[index] === '' && index > 0) {
+      document.getElementById(`otp-${index - 1}`).focus()
+    }
+  }
+
+  // Handle Verify OTP
+  const handleVerifyOtp = async () => {
+    const otpString = otp.join('')
+
+    if (otpString.length !== 4) {
+      setOtpError('Please enter all 4 digits')
+      return
+    }
+
+    try {
+      const result = await dispatch(
+        verifyOtp({
+          email,
+          otp: otpString
+        })
+      ).unwrap()
+
+      if (result.token) {
+        const algobrixBackersUser = result.user
+        const token = result.token
         localStorage.setItem('accessToken', token)
         localStorage.setItem('user', JSON.stringify(algobrixBackersUser))
 
-        // const userDataResponse = await dispatch(fetchUserData()).unwrap()
         if (algobrixBackersUser?.Status === 'Blocked') {
           localStorage.removeItem('accessToken')
           localStorage.removeItem('user')
@@ -117,8 +189,27 @@ const LoginPage = () => {
         }
       }
     } catch (error) {
-      console.error('Login error:', error)
+      setOtpError(error || 'Invalid OTP. Please check and try again.')
     }
+  }
+
+  const handleResendOtp = async () => {
+    try {
+      await dispatch(sendOtp({ email })).unwrap()
+      setResendTimer(60)
+      setOtpError('')
+    } catch (error) {
+      setOtpError(error || 'Failed to resend OTP. Please try again.')
+    }
+  }
+
+  // Reset to email step
+  const handleBackToEmail = () => {
+    dispatch(resetOtpState()) // Reset Redux state
+    setOtp(['', '', '', ''])
+    setOtpError('')
+    setResendTimer(0)
+    setEmail('')
   }
 
   return (
@@ -199,9 +290,28 @@ const LoginPage = () => {
                 color: '#054A91'
               }}
             >
-              Log in
+              {otpSent ? 'Verify OTP' : 'Log in'}
             </Typography>
+            {otpSent && !otpError && (
+              <Typography
+                variant='body2'
+                sx={{
+                  textAlign: 'center',
+                  color: '#4CAF50',
+                  mb: 2,
+                  fontWeight: 500
+                }}
+              >
+                OTP sent to {email}
+              </Typography>
+            )}
 
+            {/* OTP Error */}
+            {otpError && (
+              <Typography variant='body2' sx={{ textAlign: 'center', color: 'red', mb: 2 }}>
+                {otpError}
+              </Typography>
+            )}
             {/* Warning for Terms not accepted */}
             {termsError && (
               <Typography variant='body2' sx={{ textAlign: 'center', color: 'red', mb: 2 }}>
@@ -228,16 +338,115 @@ const LoginPage = () => {
                 })}
                 error={!!errors.email}
                 helperText={errors.email?.message || ''}
+                disabled={otpSent}
+                size='medium' // Add this for smaller size
                 sx={{
-                  mb: 4,
-                  '& label.Mui-focused': {
-                    color: '#054A91'
+                  mb: otpSent ? 2 : 3, // Reduce margin bottom
+                  '& .MuiOutlinedInput-root': {
+                    height: '44px', // Even more compact height
+                    borderRadius: '8px', // Match the reference image rounded corners
+                    '& fieldset': {
+                      borderColor: '#ddd'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#054A91'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#054A91'
+                    },
+                    '&.Mui-disabled': {
+                      backgroundColor: '#f5f5f5'
+                    }
                   },
-                  '& .MuiOutlinedInput-root.Mui-focused fieldset': {
-                    borderColor: '#054A91'
+                  '& .MuiInputBase-input': {
+                    padding: '10px 12px', // More compact padding
+                    fontSize: '0.95rem'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '0.95rem',
+                    color: '#666',
+                    transform: 'translate(12px, 12px) scale(1)',
+                    '&.Mui-focused': {
+                      color: '#054A91'
+                    },
+                    '&.Mui-focused, &.MuiFormLabel-filled': {
+                      transform: 'translate(12px, -8px) scale(0.75)'
+                    }
+                  },
+                  '& .MuiFormHelperText-root': {
+                    fontSize: '0.8rem',
+                    marginTop: '4px'
                   }
                 }}
               />
+
+              {/* 4-Box OTP Input - appears after email verification */}
+              <Fade in={otpSent} timeout={500}>
+                <Box sx={{ mb: otpSent ? 3 : 0 }}>
+                  {otpSent && (
+                    <Box>
+                      <Typography
+                        variant='body2'
+                        sx={{
+                          textAlign: 'center',
+                          mb: 2,
+                          fontWeight: 600,
+                          color: '#054A91'
+                        }}
+                      >
+                        Enter 4-digit OTP
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: 2,
+                          mb: 2
+                        }}
+                      >
+                        {otp.map((digit, index) => (
+                          <TextField
+                            key={index}
+                            id={`otp-${index}`}
+                            value={digit}
+                            onChange={e => handleOtpChange(index, e.target.value.replace(/\D/g, ''))}
+                            onKeyDown={e => handleOtpKeyDown(index, e)}
+                            inputProps={{
+                              inputMode: 'numeric',
+                              pattern: '\\d{1}',
+                              maxLength: 1,
+                              style: {
+                                textAlign: 'center',
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold'
+                              }
+                            }}
+                            sx={{
+                              width: 60,
+                              height: 60,
+                              '& .MuiOutlinedInput-root': {
+                                height: 60,
+                                borderRadius: 2,
+                                '& fieldset': {
+                                  borderColor: otpError ? 'red' : '#ddd',
+                                  borderWidth: 2
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: otpError ? 'red' : '#054A91'
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: otpError ? 'red' : '#054A91',
+                                  borderWidth: 2
+                                }
+                              }
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              </Fade>
 
               {/* Password 
               <FormControl
@@ -279,6 +488,7 @@ const LoginPage = () => {
               </FormControl>
             */}
               {/*Forgot Password and Terms Row  */}
+              {/* Terms and Resend Section */}
               <Box
                 sx={{
                   display: { xs: 'block', sm: 'flex' },
@@ -287,64 +497,84 @@ const LoginPage = () => {
                   mb: 3
                 }}
               >
-                {/*   <Box sx={{ mb: { xs: 1, sm: 0 } }}>
-                  <Link passHref href='/pages/forgotpassword'>
-                    <Typography
+                {/* Terms Checkbox - only show if OTP not sent */}
+                {!otpSent && (
+                  <Box>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          size='small'
+                          checked={termsChecked}
+                          onChange={e => {
+                            setTermsChecked(e.target.checked)
+                            if (e.target.checked) setTermsError(false)
+                          }}
+                          sx={{
+                            '&.Mui-checked': { color: '#054A91' }
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography
+                          sx={{
+                            fontSize: '0.7rem',
+                            fontWeight: 900,
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          By logging in I approve the{' '}
+                          <Link passHref href='/pages/termsofuse'>
+                            <Typography
+                              component='span'
+                              sx={{
+                                color: '#054A91',
+                                fontSize: '0.7rem',
+                                textDecoration: 'none',
+                                cursor: 'pointer',
+                                fontWeight: 1000
+                              }}
+                            >
+                              Terms of use
+                            </Typography>
+                          </Link>
+                        </Typography>
+                      }
+                      sx={{ mr: 0 }}
+                    />
+                  </Box>
+                )}
+
+                {/* Resend OTP Section - only show if OTP sent */}
+                {otpSent && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center', width: '100%' }}>
+                    <Button
+                      variant='text'
+                      onClick={handleResendOtp}
+                      disabled={resendTimer > 0 || sendingOtp}
                       sx={{
-                        cursor: 'pointer',
-                        fontSize: '0.8rem',
-                        whiteSpace: 'nowrap',
                         color: '#054A91',
-                        fontWeight: 700
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        textTransform: 'none'
                       }}
                     >
-                      Forgot password?
-                    </Typography>
-                  </Link>
-                </Box> */}
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size='small'
-                        checked={termsChecked}
-                        onChange={e => {
-                          setTermsChecked(e.target.checked)
-                          if (e.target.checked) setTermsError(false)
-                        }}
-                        sx={{
-                          '&.Mui-checked': { color: '#054A91' }
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography
-                        sx={{
-                          fontSize: '0.7rem',
-                          fontWeight: 900,
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        By logging in I approve the{' '}
-                        <Link passHref href='/pages/termsofuse'>
-                          <Typography
-                            component='span'
-                            sx={{
-                              color: '#054A91',
-                              fontSize: '0.7rem',
-                              textDecoration: 'none',
-                              cursor: 'pointer',
-                              fontWeight: 1000
-                            }}
-                          >
-                            Terms of use
-                          </Typography>
-                        </Link>
-                      </Typography>
-                    }
-                    sx={{ mr: 0 }}
-                  />
-                </Box>
+                      {resendTimer > 0 ? `Resend OTP (${resendTimer}s)` : 'Resend OTP'}
+                    </Button>
+
+                    <Button
+                      variant='text'
+                      onClick={handleBackToEmail}
+                      sx={{
+                        color: '#666',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Change Email
+                    </Button>
+                  </Box>
+                )}
               </Box>
 
               {/* Login Button */}
@@ -363,7 +593,21 @@ const LoginPage = () => {
                   }
                 }}
               >
-                LOGIN
+                {sendingOtp ? (
+                  <>
+                    <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                    SENDING OTP...
+                  </>
+                ) : verifyingOtp ? (
+                  <>
+                    <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                    VERIFYING...
+                  </>
+                ) : otpSent ? (
+                  'VERIFY OTP'
+                ) : (
+                  'SEND OTP'
+                )}
               </Button>
 
               {/* "Want to join?" Section */}
