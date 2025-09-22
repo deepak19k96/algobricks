@@ -88,16 +88,19 @@ const LoginPage = () => {
     if (!otpSent) {
       if (!termsChecked) {
         setTermsError(true)
+
         return
       }
 
       await handleSendOtp()
     }
+
     // Second step: Verify OTP
     else {
       await handleVerifyOtp()
     }
   }
+
   // Resend timer countdown
   useEffect(() => {
     let interval = null
@@ -108,6 +111,7 @@ const LoginPage = () => {
     } else if (resendTimer === 0) {
       clearInterval(interval)
     }
+
     return () => clearInterval(interval)
   }, [resendTimer])
 
@@ -121,6 +125,7 @@ const LoginPage = () => {
 
     if (!termsChecked) {
       setTermsError(true)
+
       return
     }
 
@@ -163,6 +168,7 @@ const LoginPage = () => {
 
     if (otpString.length !== 4) {
       setOtpError('Please enter all 4 digits')
+
       return
     }
 
