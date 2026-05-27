@@ -1,7 +1,7 @@
 // pages/_app.js
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import { store } from '../store'
 import NProgress from 'nprogress'
@@ -25,29 +25,45 @@ if (themeConfig.routingLoader) {
   NProgress.configure({ showSpinner: false })
 }
 
+const PUBLIC_ROUTES = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse', '/blockeduser']
+
 // Global component to fetch user details and check user status
 const FetchUserDetail = () => {
   const dispatch = useDispatch()
   const router = useRouter()
+  const routerRef = useRef(router)
+  routerRef.current = router
+
+  const hasFetchedRef = useRef(false)
 
   useEffect(() => {
-    // Only fetch if a token exists (i.e. user is logged in)
-    if (typeof window !== 'undefined' && localStorage.getItem('accessToken') && localStorage.getItem('user')) {
-      dispatch(fetchUserData())
-        .unwrap()
-        .then(data => {
-          if (data.user.Status === 'Blocked') {
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('user')
-            router.push('/blockeduser')
-          }
-        })
-        .catch(error => {
-          router.push('/pages/login')
-          console.error('Error fetching user data:', error)
-        })
-    }
-  }, [dispatch, router])
+    if (typeof window === 'undefined') return
+    if (hasFetchedRef.current) return
+
+    const token = localStorage.getItem('accessToken')
+    const userStr = localStorage.getItem('user')
+    if (!token || !userStr) return
+
+    hasFetchedRef.current = true
+
+    dispatch(fetchUserData())
+      .unwrap()
+      .then(data => {
+        if (data?.user?.Status === 'Blocked') {
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('user')
+          routerRef.current.push('/blockeduser')
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error)
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('user')
+        if (!PUBLIC_ROUTES.includes(routerRef.current.pathname)) {
+          routerRef.current.push('/pages/login')
+        }
+      })
+  }, [dispatch])
 
   return null
 }
@@ -57,16 +73,19 @@ const App = props => {
   const router = useRouter()
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken')
-      const user = localStorage.getItem('user')
-      const parsedUser = typeof user === 'string' ? JSON.parse(user) : user
-      const publicRoutes = ['/pages/login', '/pages/forgotpassword', '/pages/termsofuse', '/blockeduser']
-      if ((!token || !parsedUser?.Email) && !publicRoutes.includes(router.pathname)) {
-        router.push('/pages/login')
-      }
+    if (typeof window === 'undefined') return
+    const token = localStorage.getItem('accessToken')
+    const user = localStorage.getItem('user')
+    let parsedUser = null
+    try {
+      parsedUser = typeof user === 'string' ? JSON.parse(user) : user
+    } catch (e) {
+      parsedUser = null
     }
-  }, [router.pathname, router])
+    if ((!token || !parsedUser?.Email) && !PUBLIC_ROUTES.includes(router.pathname)) {
+      router.push('/pages/login')
+    }
+  }, [router.pathname])
 
   if (!Component) {
     return null
