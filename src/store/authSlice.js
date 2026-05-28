@@ -174,7 +174,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true
         state.isLoading = false
         state.error = null
-        localStorage.setItem('accessToken', action.payload.token)
+        if (action.payload.token) {
+          localStorage.setItem('accessToken', action.payload.token)
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false
@@ -191,7 +193,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true
         state.isLoading = false
         state.error = null
-        localStorage.setItem('accessToken', action.payload.token)
+        if (action.payload.token) {
+          localStorage.setItem('accessToken', action.payload.token)
+        }
       })
       .addCase(getAlgobrixBackersByEmail.rejected, (state, action) => {
         state.isLoading = false
@@ -225,7 +229,9 @@ const authSlice = createSlice({
         state.verifyingOtp = false
         state.otpSent = false
         state.error = null
-        localStorage.setItem('accessToken', action.payload.token)
+        if (action.payload.token) {
+          localStorage.setItem('accessToken', action.payload.token)
+        }
       })
       .addCase(verifyOtp.rejected, (state, action) => {
         state.verifyingOtp = false

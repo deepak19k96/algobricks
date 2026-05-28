@@ -14,9 +14,23 @@ axiosInstance.interceptors.request.use(
     // Get the token from localStorage
     const accessToken = localStorage.getItem('accessToken')
 
+    // Clean up corrupted tokens that were saved as strings
+    if (accessToken === 'undefined' || accessToken === 'null') {
+      localStorage.removeItem('accessToken')
+    }
+
+    const validToken = localStorage.getItem('accessToken')
+
     // Modify config before sending the request
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`
+    // Skip Authorization for specific public endpoints. WordPress sometimes rejects authenticated
+    // requests for public resources if the user role doesn't have explicit custom permissions.
+    const isPublicEndpoint = 
+      config.url?.includes('wp/v2/package') || 
+      config.url?.includes('wp/v2/pages') || 
+      config.url?.includes('get-algobrix-backers')
+    
+    if (validToken && !isPublicEndpoint) {
+      config.headers['Authorization'] = `Bearer ${validToken}`
 
       //config.headers['Path'] = path;
     }
@@ -37,8 +51,10 @@ axiosInstance.interceptors.response.use(
   },
   error => {
     const originalRequest = error.config
-    if (error.response.status === 401 && !originalRequest._retry) {
-      // Handle case where no refresh token is available
+    const isJwtError = error.response?.data?.code?.includes('jwt_auth');
+
+    if ((error.response.status === 401 || (error.response.status === 403 && isJwtError)) && !originalRequest._retry) {
+      // Handle case where no refresh token is available or token is invalid
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken')
         window.location.href = '/pages/login'
